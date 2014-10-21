@@ -1,8 +1,8 @@
 #coding = utf-8
 import socket
 import os
+from common import appendLog
 import time
-
 
 runList = os.path.join("RunList","list_ToRun.txt")
 doneList = os.path.join("RunList","list_done.txt")
@@ -29,15 +29,6 @@ def writeClips(fromFile,toFile):
     toRunListHandle.close()
     doneListHandle.close()
 
-def appendLog(message):
-    print message
-    logFile = open("Log\PowerTestLog.txt","a")
-    logFile.write(message +"\n")
-    logFile.close()
-
-
-
-
 if __name__ == "__main__":
 
     while True:
@@ -53,15 +44,15 @@ if __name__ == "__main__":
             appendLog("Current test clip : %s" % clipNameToRun)
             sock.sendto(clipNameToRun, address)
             batFileName =  clipNameToRun + '.bat'
-            os.system(batFileName)
-            appendLog("%s  power test end..." % clipNameToRun)
+            os.system(batFileName)        
             sock.sendto(clipNameToRun,address)  # end signal sent
-            time.sleep(2)
+            appendLog("%s  power test end..." % clipNameToRun)
             context = ''.join(clipsToRunList[1:len(clipsToRunList)])
             listToRunWriteHandle = open('RunList\List_ToRun.txt','w')
             listToRunWriteHandle.write(context)
             listToRunWriteHandle.close()
             sock.close()
+            time.sleep(60)
             appendLog("will restart....")
             # restartOS()
         else:
@@ -71,5 +62,5 @@ if __name__ == "__main__":
             # removeStartupService()
             appendLog("Power test finished...")
             break
-        time.sleep(65)
+
 
