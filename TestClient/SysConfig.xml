@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Vp9_Perf_Test_Config version="1.0.0">
+	<Path>
+		<ClipsPath>..\Clips</ClipsPath>
+		<TempLogPath>..\Temp</TempLogPath>
+		<RegPath>..\reg</RegPath>
+		<RunListPath>..\RunList</RunListPath>
+	</Path>
+    <LogFiles>
+		<GPUReport>%s_GPU.csv</GPUReport>
+		<CPUReport>%s_CPU.csv</CPUReport>
+	</LogFiles>
+	
+	<Apps path='..\App\'>
+		<mv_decoder_adv path='..\App\'>
+			<Binary>mv_decoder_adv_1011.exe </Binary>
+			<AsyncMode>
+				<Freerun>--vp9 -i %s.webm --fps asap --disp --full --filpex > %s.txt</Freerun>
+				<FixedFPS>
+					<Thirty>--vp9 -i %s.webm --fps ntsc --disp fullscreen 2> %s.txt</Thirty>
+					<Sixty>--vp9 -i %s.webm --fps ntsc60 --disp fullscreen 2> %s.txt</Sixty>
+				</FixedFPS>
+			</AsyncMode>
+			<SyncMode>
+				<Freerun>--vp9 -i %s.webm --disp fullscreen 2> %s.txt</Freerun>
+				<FixedFPS>
+					<Thirty>--vp9 -i %s.webm --fps ntsc --disp fullscreen 2> %s.txt</Thirty>
+					<Sixty>--vp9 -i %s.webm --fps ntsc60 --disp fullscreen 2> %s.txt</Sixty>
+				</FixedFPS>
+			</SyncMode>
+			<Decode>
+				<Freerun>--vp9 -i %s > %s.txt</Freerun>
+				<FixedFPS>
+					<Thirty>--vp9 -i %s.webm --fps ntsc 2> %s.txt</Thirty>
+					<Sixty>--vp9 -i %s.webm --fps ntsc60 2> %s.txt</Sixty>
+				</FixedFPS>
+			</Decode>
+			<RunList>list_mv.csv</RunList>
+		</mv_decoder_adv>
+		<mfx_player>
+			<Binary>mfx_player.exe </Binary>
+			<AsyncMode>
+				<Freerun>-i:webm %s.webm -hw -fullscreen -async 5 -async_depth 5 -mfxdll libmfxhw32.dll > %s.txt</Freerun>
+				<FixedFPS>
+					<Thirty>-i:webm %s.webm -fps 30 -hw -fullscreen -async 5 -async_depth 5 -mfxdll libmfxhw32.dll > %s.txt</Thirty>
+					<Sixty>-i:webm %s.webm -fps 60 -hw -fullscreen -async 5 -async_depth 5 -mfxdll libmfxhw32.dll > %s.txt</Sixty>
+				</FixedFPS>
+			</AsyncMode>
+			<SyncMode>
+				<Freerun>-i:webm %s.webm -hw -fullscreen -async 1 -async_depth 1 -mfxdll libmfxhw32.dll > %s.txt</Freerun>
+				<FixedFPS>
+					<Thirty>-i:webm %s.webm -hw -fullscreen -async 1 -async_depth 1 -mfxdll libmfxhw32.dll -fps 30 > %s.txt</Thirty>
+					<Sixty>-i:webm %s.webm -hw -fullscreen -async 1 -async_depth 1 -mfxdll libmfxhw32.dll -fps 60 > %s.txt</Sixty>
+				</FixedFPS>
+			</SyncMode>
+			<Decode>
+				<Freerun>-i:webm %s.webm -hw_strict -no_render -mfxdll libmfxhw32.dll > %s.txt</Freerun>
+				<FixedFPS>
+					<Thirty>-i:webm %s.webm -fps 30 -hw_strict -no_render -mfxdll libmfxhw32.dll > %s.txt</Thirty>
+					<Sixty>-i:webm %s.webm -fps 60 -hw_strict -no_render -mfxdll libmfxhw32.dll > %s.txt</Sixty>
+				</FixedFPS>
+			</Decode>
+			<RunList>list_mfx.csv</RunList>
+		</mfx_player>
+		<firefox>
+			<Binary>firefox.lnk </Binary>
+			<AsyncMode>
+				<Freerun>%s</Freerun>
+				<FixedFPS>
+					<Thirty>%s</Thirty>
+					<Sixty>%s</Sixty>
+				</FixedFPS>
+			</AsyncMode>
+			<SyncMode>
+				<Freerun>%s</Freerun>
+				<FixedFPS>
+					<Thirty>%s</Thirty>
+					<Sixty>%s</Sixty>
+				</FixedFPS>
+			</SyncMode>
+			<Decode>
+				<Freerun>%s</Freerun>
+				<FixedFPS>
+					<Thirty>%s</Thirty>
+					<Sixty>%s</Sixty>
+				</FixedFPS>
+			</Decode>
+			<RunList>list_firefox.csv</RunList>
+		</firefox>
+		<chrome>
+			<Binary>chrome.lnk </Binary>
+			<AsyncMode>
+				<Freerun>%s</Freerun>
+				<FixedFPS>
+					<Thirty>%s</Thirty>
+					<Sixty>%s</Sixty>
+				</FixedFPS>
+			</AsyncMode>
+			<SyncMode>
+				<Freerun>%s</Freerun>
+				<FixedFPS>
+					<Thirty>%s</Thirty>
+					<Sixty>%s</Sixty>
+				</FixedFPS>
+			</SyncMode>
+			<Decode>
+				<Freerun>%s</Freerun>
+				<FixedFPS>
+					<Thirty>%s</Thirty>
+					<Sixty>%s</Sixty>
+				</FixedFPS>
+			</Decode>
+			<RunList>list_chrome.csv</RunList>
+		</chrome>
+	</Apps>
+</Vp9_Perf_Test_Config>

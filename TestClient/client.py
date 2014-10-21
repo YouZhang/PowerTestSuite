@@ -1,13 +1,17 @@
 #coding = utf-8
 import socket
+import sys
 import os
-from common import appendLog
 import time
+sys.path.append("Lib")
+from common import appendLog
+from App import appProcess
 
 runList = os.path.join("RunList","list_ToRun.txt")
 doneList = os.path.join("RunList","list_done.txt")
 # address = ('10.239.141.154', 31500)
 address = ('127.0.0.1', 31500)
+testAppName = "mv_decoder_adv"
 
 def addStartupService():
     command = 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /v Client /t reg_sz /d "F:\SHU\PowerTestSuite\TestClient\client.py" /f'
@@ -41,10 +45,12 @@ if __name__ == "__main__":
 
         if( clipsToRunList != [] ):
             clipNameToRun = clipsToRunList[0].strip('\n')
+            appProcess(testAppName,clipNameToRun)
             appendLog("Current test clip : %s" % clipNameToRun)
             sock.sendto(clipNameToRun, address)
             batFileName =  clipNameToRun + '.bat'
             os.system(batFileName)        
+            time.sleep(30)
             sock.sendto(clipNameToRun,address)  # end signal sent
             appendLog("%s  power test end..." % clipNameToRun)
             context = ''.join(clipsToRunList[1:len(clipsToRunList)])

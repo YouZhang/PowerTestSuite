@@ -1,5 +1,7 @@
 # coding = utf-8
 
+import sys
+sys.path.append('Lib')
 from PowerProcessor import *
 
 
@@ -17,6 +19,7 @@ class testConfig(object):
 
 def initEnv():
     global myConfig
+
     myConfig = testConfig()
     mkResFolderCMD = "mkdir " + myConfig.resultFolder
     mkRawDataPath = "mkdir " + myConfig.rawDataStoreFolder
