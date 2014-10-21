@@ -1,17 +1,8 @@
-# coding = utf-8
 import socket
 import string
-import xlsxwriter
-
-
-# ('cases',"VCCIN1", "VCCIN2", "MemTotal", "DIMM")
-
-def appendLog(message):
-
-    print message
-    logFile = open("Log\PowerTestLog.txt","r+")
-    logFile.write(message + "\n")
-    logFile.close()
+import os
+import common
+from Diagram import diagram
 
 class powerDataMem(object):
 
@@ -57,14 +48,18 @@ class powerDataMem(object):
 
 class powerProcessor():
 
-    def __init__(self, powerDataMem):
+    def __init__(self, powerDataMem,inputRawData,outputFile,startButtonPos,stopButtonPos):
 
         self.powerMem = powerDataMem
+        self.inputRawData = inputRawData
+        self.resultDiagram = diagram(outputFile)
+        # self.address = ('10.239.141.154', 31500)
         self.address = ('127.0.0.1', 31500)
         self.isCapturing = False
-        self.resultDiagram = diagram()
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(self.address)
+        self.startButtonPos = startButtonPos
+        self.stopButtonPos = stopButtonPos
 
     def getDataFromLVM(self,lvmFile):
 
@@ -80,75 +75,49 @@ class powerProcessor():
                         parseFlag = True
             return self.powerMem.getFinalResult()
         except:
-            appendLog( "error in lvm file")
+            common.appendLog( "error in lvm file")
             exit(-1)
+
+    def startCapture(self):
+        common.mouseClick(self.startButtonPos[0],self.startButtonPos[1])
+
+    def stopCapture(self):
+        common.mouseClick(self.stopButtonPos[0],self.stopButtonPos[1])
 
     def process(self):
 
         while True:
-            appendLog("reciving tag from client...")
+            common.appendLog("receiving start/stop tag from client...")
             case, addr = self.sock.recvfrom(2048)
             if not case:
-                appendLog("client has exist")
+                common.appendLog("client has exist")
                 break
-            appendLog("received: %s from %s" % (case, addr) )
-            lvmFile = case + ".lvm"
+            common.appendLog("received: %s from %s" % (case, addr) )
+            lvmFile = self.inputRawData
             if("end" in case):
-                appendLog("all cases finished...\nResult diagram will be generated")
+                common.appendLog("all cases finished...\nResult diagram will be generated")
                 break
             elif(not self.isCapturing):
                 self.isCapturing = True
-                appendLog("start capturing power data...")
-                startCapture()
-                moveFile(lvmFile)
+                common.appendLog("start capturing %s power data..." % case)
+                self.startCapture()
             else:
                 self.isCapturing = False
-                stopCapture()
+
+                self.stopCapture()
+                common.appendLog("stop capturing %s power data..." % case)
+                lvmFile = moveFile(case,lvmFile)
                 powerData = self.getDataFromLVM(lvmFile)
                 self.resultDiagram.addData(case,powerData)
+                self.powerMem.__init__()
 
         self.sock.close()
         self.resultDiagram.genDiagram()
 
 
-class diagram(object):
-
-    def __init__(self):
-        self.workBook = xlsxwriter.Workbook('PowerData__.xlsx')
-        self.workSheet = self.workBook.add_chartsheet()
-        self.workSheet.write_row(0,0,('cases','VCCIN1','VCCIN2','MemTotal','DIMM'))
-        self.row = 0
-
-    def addData(self,case,powerData):
-        self.row += 1
-        powerData.insert(0,case)
-        self.workSheet.write_row(0,self.row,powerData)
-
-    def genDiagram(self):
-        lineChart = self.workBook.add_chart({'type': 'line'})
-        series = {
-            'categories' : '=Sheet1!$A$1:$A$3',
-            'values' : '=Sheet1!$B$1:$B$3'
-        }
-        lineChart.add_series(series)
-        lineChart.set_style(10)
-        self.workSheet.insert_chart('F2', lineChart, {'x_offset': 25, 'y_offset': 10})
-        self.workBook.close()
-
-def startCapture():
-    pass
-
-
-def stopCapture():
-    pass
-
-def moveFile(clip):
-    pass
-
-rawDataPath = "Raw_Data\\test.lvm"
-
-if __name__ == "__main__":
-
-    myPowerMem = powerDataMem()
-    myProcessor = powerProcessor(myPowerMem)
-    myProcessor.process()
+def moveFile(caseName,fromPath):
+    lvmFile = 'RawData\%s.lvm' % caseName
+    renameCMD = "move %s %s" % (fromPath,lvmFile)
+    print renameCMD
+    os.system(renameCMD)
+    return lvmFile

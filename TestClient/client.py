@@ -3,6 +3,12 @@ import socket
 import os
 import time
 
+
+runList = os.path.join("RunList","list_ToRun.txt")
+doneList = os.path.join("RunList","list_done.txt")
+# address = ('10.239.141.154', 31500)
+address = ('127.0.0.1', 31500)
+
 def addStartupService():
     command = 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /v Client /t reg_sz /d "F:\SHU\PowerTestSuite\TestClient\client.py" /f'
     os.system(command)
@@ -25,14 +31,12 @@ def writeClips(fromFile,toFile):
 
 def appendLog(message):
     print message
-    logFile = open("Log\PowerTestLog.txt","r+")
+    logFile = open("Log\PowerTestLog.txt","a")
     logFile.write(message +"\n")
     logFile.close()
 
 
-runList = "RunList\list_ToRun.csv"
-doneList = "RunList\list_ToRun.csv"
-address = ('127.0.0.1', 31500)
+
 
 if __name__ == "__main__":
 
@@ -43,13 +47,14 @@ if __name__ == "__main__":
         listToRunReadHandle = open('RunList\List_ToRun.txt','r')
         clipsToRunList = listToRunReadHandle.readlines()
         listToRunReadHandle.close()
-        clipNameToRun = clipsToRunList[0].strip('\n')
-        if( clipNameToRun ):
+
+        if( clipsToRunList != [] ):
+            clipNameToRun = clipsToRunList[0].strip('\n')
             appendLog("Current test clip : %s" % clipNameToRun)
             sock.sendto(clipNameToRun, address)
-            batFileName = clipNameToRun + '.bat'
+            batFileName =  clipNameToRun + '.bat'
             os.system(batFileName)
-            appendLog("%s  test end..." % clipNameToRun)
+            appendLog("%s  power test end..." % clipNameToRun)
             sock.sendto(clipNameToRun,address)  # end signal sent
             time.sleep(2)
             context = ''.join(clipsToRunList[1:len(clipsToRunList)])
@@ -63,8 +68,8 @@ if __name__ == "__main__":
             writeClips(doneList,runList)
             sock.sendto("done",address)
             appendLog( "all clips power test done!\nremoving startup service...")
-            removeStartupService()
-            sock.sendto(clipNameToRun, address)
+            # removeStartupService()
             appendLog("Power test finished...")
-        time.sleep(100)
+            break
+        time.sleep(65)
 
