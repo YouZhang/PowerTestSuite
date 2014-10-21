@@ -63,7 +63,7 @@ class testConfig(object):
 
 
 
-def getSysConfig(type,tag,xmlFile = "..\SysConfig.xml"):
+def getSysConfig(type,tag,xmlFile = 'SysConfig.xml'):
     try:
         tree = ET.parse(xmlFile)
         root = tree.getroot()

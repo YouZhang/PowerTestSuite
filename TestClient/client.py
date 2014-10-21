@@ -5,7 +5,7 @@ import os
 import time
 sys.path.append("Lib")
 from common import appendLog
-from App import appProcess
+from App import *
 
 runList = os.path.join("RunList","list_ToRun.txt")
 doneList = os.path.join("RunList","list_done.txt")
