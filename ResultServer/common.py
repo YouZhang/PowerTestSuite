@@ -4,13 +4,17 @@ import win32api
 import win32con
 import time
 from ctypes import *
+import os
 
+
+localTime = time.strftime("%Y-%m-%d_%H-%M-%S",time.localtime())
 
 def appendLog(message):
     print message
-    logFile = open("Log\PowerTestLog.txt","a")
-    logFile.write(message + "\n")
-    logFile.close()
+    logfile = os.path.join("Log",localTime+".log")
+    logHandle = open(logfile,"a")
+    logHandle.write(message + "\n\n")
+    logHandle.close()
 
 VK_CODE = {
     'backspace':0x08,
