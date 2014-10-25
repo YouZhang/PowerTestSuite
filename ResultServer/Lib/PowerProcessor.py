@@ -124,7 +124,7 @@ class powerProcessor(object):
             common.appendLog(message)
             powerData.insert(0,lvmFile)
             self.resultDiagram.addData(powerData)
-            print "-------------------------------------------------------------------"
+            common.appendLog("--------------------------------------------------------------")
             self.powerMem.__init__()
         self.resultDiagram.addDiagram(self.targetDataPos)
         self.resultDiagram.genDiagram()
