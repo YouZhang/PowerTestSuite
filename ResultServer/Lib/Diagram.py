@@ -15,21 +15,16 @@ class diagram(object):
         self.row += 1
         self.workSheet.write_row(self.row,0,data)
 
-    def genDiagram(self):
-        lineChart = self.workBook.add_chart({'type': self.chartType})
+    def addDiagram(self,targetDataPos):
+        chart = self.workBook.add_chart({'type': self.chartType})
         series = {
             'categories' : '=Sheet1!$A$2:$A$'+str(self.row + 1) ,
-            'values' : '=Sheet1!$F$2:$F$' + str(self.row + 1)
+            'values' : '=Sheet1!$targetDataPos$2:$targetDataPos$'.replace("targetDataPos",targetDataPos) + str(self.row + 1)
         }
-        lineChart.add_series(series)
-        lineChart.set_style(self.chartStyle)
-        self.workSheet.insert_chart(self.row + 2,0, lineChart, {'x_offset': 10, 'y_offset': 10})
-        self.workBook.close()
+        chart.set_legend({'position': 'top'})
+        chart.add_series(series)
+        chart.set_style(self.chartStyle)
+        self.workSheet.insert_chart(self.row + 2,0, chart, {'x_offset': 10, 'y_offset': 10})
 
-def testDiagram():
-    myDiagram = diagram("test.xlsx")
-    myDiagram.addData([22,23,24,25])
-    myDiagram.addData([22,23,24,25])
-    myDiagram.addData([22,23,24,25])
-    myDiagram.addData([22,23,24,25])
-    myDiagram.genDiagram()
+    def genDiagram(self):
+        self.workBook.close()

@@ -58,6 +58,7 @@ class powerProcessor(object):
         self.stopButtonPos = myConfig.stopButtonPos
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(self.address)
+        self.targetDataPos = myConfig.targetDataPos
         self.isCapturing = False
 
     def getDataFromLVM(self,lvmFile):
@@ -111,6 +112,7 @@ class powerProcessor(object):
                 self.powerMem.__init__()
                 common.appendLog("--------------------------------------------------------------")
         self.sock.close()
+        self.resultDiagram.addDiagram(self.targetDataPos)
         self.resultDiagram.genDiagram()
 
     def localProcess(self,lvmFileList):
@@ -124,6 +126,7 @@ class powerProcessor(object):
             self.resultDiagram.addData(powerData)
             print "-------------------------------------------------------------------"
             self.powerMem.__init__()
+        self.resultDiagram.addDiagram(self.targetDataPos)
         self.resultDiagram.genDiagram()
 
 def renameFile(beforeName,newName):

@@ -30,3 +30,4 @@ class testConfig(object):
         self.chartType = configFile.getSysConfigItem("Misc","chartType")
         self.chartStyle = int(configFile.getSysConfigItem("Misc","chartStyle"))
         self.LogFilePath = configFile.getSysConfigItem("Misc","LogPath")
+        self.targetDataPos = configFile.getSysConfigItem("Misc","targetDataPos")

@@ -9,8 +9,9 @@
         <startButtonPos>65  55</startButtonPos>
         <stopButtonPos>110  55</stopButtonPos>
         <initRow>Cases  VCCIN1  VCCIN2  MemTotal  DIMM  Total</initRow>
-        <chartType>line</chartType>
+        <chartType>bar</chartType>
         <chartStyle>10</chartStyle>
         <localDataPath>localProcessData</localDataPath>
+        <targetDataPos>F</targetDataPos>
 	</Misc>
 </Vp9_Power_Test_Config>
