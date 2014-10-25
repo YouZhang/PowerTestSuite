@@ -3,7 +3,6 @@ import string
 import os
 import common
 from Diagram import diagram
-import time
 
 class powerDataMem(object):
 
@@ -53,7 +52,7 @@ class powerProcessor(object):
     def __init__(self, powerDataMem,myConfig):
         self.powerMem = powerDataMem
         self.inputRawData = myConfig.rawDataFilePath
-        self.resultDiagram = diagram(myConfig.resultFile)
+        self.resultDiagram = diagram(myConfig.resultFile,myConfig.initRow,myConfig.chartType,myConfig.chartStyle)
         self.address = myConfig.address
         self.startButtonPos = myConfig.startButtonPos
         self.stopButtonPos = myConfig.stopButtonPos
@@ -62,7 +61,6 @@ class powerProcessor(object):
         self.isCapturing = False
 
     def getDataFromLVM(self,lvmFile):
-
         parseFlag = False
         try:
             with open(lvmFile, 'r') as rawDataFile:
@@ -79,13 +77,12 @@ class powerProcessor(object):
             exit(-1)
 
     def startCapture(self):
-        common.mouseClick(self.startButtonPos[0],self.startButtonPos[1])
+        common.mouseClick(int(self.startButtonPos[0]),int(self.startButtonPos[1]))
 
     def stopCapture(self):
-        common.mouseClick(self.stopButtonPos[0],self.stopButtonPos[1])
+        common.mouseClick(int(self.stopButtonPos[0]),int(self.stopButtonPos[1]))
 
     def process(self):
-
         while True:
             common.appendLog("receiving start/stop tag from client...")
             case, addr = self.sock.recvfrom(2048)
@@ -109,12 +106,25 @@ class powerProcessor(object):
                 powerData = self.getDataFromLVM(lvmFile)
                 message = "VCCIN1 : %s\nVCCIN2 : %s\nMemToal : %s\nDIMM : %s\nTotalPower:%s" % tuple(powerData)
                 common.appendLog(message)
-                self.resultDiagram.addData(case,powerData)
+                powerData.insert(0,case)
+                self.resultDiagram.addData(powerData)
                 self.powerMem.__init__()
                 common.appendLog("--------------------------------------------------------------")
         self.sock.close()
         self.resultDiagram.genDiagram()
 
+    def localProcess(self,lvmFileList):
+        self.powerMem.__init__()
+        for lvmFile in lvmFileList:
+            common.appendLog("processing %s ..." % lvmFile)
+            powerData = self.getDataFromLVM(lvmFile)
+            message = "VCCIN1 : %s\nVCCIN2 : %s\nMemToal : %s\nDIMM : %s\nTotalPower:%s" % tuple(powerData)
+            common.appendLog(message)
+            powerData.insert(0,lvmFile)
+            self.resultDiagram.addData(powerData)
+            print "-------------------------------------------------------------------"
+            self.powerMem.__init__()
+        self.resultDiagram.genDiagram()
 
 def renameFile(beforeName,newName):
     targetFile = 'RawData\%s.lvm' % newName

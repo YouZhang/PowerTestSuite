@@ -22,17 +22,6 @@ class App(object):
                     targetNode = targetNode.find(params[i])
             return targetNode.text
 
-        # self.AsyncFreeParam = app.find("AsyncMode").find("Freerun").text
-        # self.AsyncFixed30Param = app.find("AsyncMode").find("FixedFPS").find("Thirty").text
-        # self.AsyncFixed60Param = app.find("AsyncMode").find("FixedFPS").find("Sixty").text
-        # self.SyncFreeParam = app.find("SyncMode").find("Freerun").text
-        # self.SyncFixed30Param = app.find("SyncMode").find("FixedFPS").find("Thirty").text
-        # self.SyncFixed60Param = app.find("SyncMode").find("FixedFPS").find("Sixty").text
-        # self.DecodeFreeParam = app.find("Decode").find("Freerun").text
-        # self.DecodeFixed30Param = app.find("Decode").find("FixedFPS").find("Thirty").text
-        # self.DecodeFixed60Param = app.find("Decode").find("FixedFPS").find("Sixty").text
-        # self.RunList = app.find("RunList").text
-
     def generateCMD(self,param):
         cmd = self.Binary + param
         return cmd
@@ -48,7 +37,7 @@ class App(object):
 
 
 
-class testConfig(object):
+class appConfig(object):
 
     def __init__(self):
         self.AsyncFreePlay = ("AsyncMode","Freerun")
@@ -74,7 +63,7 @@ def getSysConfig(type,tag,xmlFile = 'SysConfig.xml'):
     return item
 
 def appProcess(appName,clipName):
-    myConfig = testConfig()
+    myConfig = appConfig()
     testApp = App(appName)
     cmdParam = testApp.getCmdParam(myConfig.AsyncFreePlay)
     cmd = testApp.generateCMD(cmdParam)
