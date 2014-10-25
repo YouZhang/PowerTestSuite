@@ -25,6 +25,7 @@ class diagram(object):
         chart.add_series(series)
         chart.set_style(self.chartStyle)
         self.workSheet.insert_chart(self.row + 2,0, chart, {'x_offset': 10, 'y_offset': 10})
+        self.row += 15
 
     def genDiagram(self):
         self.workBook.close()
