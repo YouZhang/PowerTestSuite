@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Vp9_Power_Test_Config version="1.0.0">
+	<Misc>
+        <Address>127.0.0.1</Address>
+        <Port>31500</Port>
+		<LogPath>Log</LogPath>
+        <resultFolder>Results</resultFolder>
+        <rawDataFolder>RawData</rawDataFolder>
+        <startButtonPos>65  55</startButtonPos>
+        <stopButtonPos>110  55</stopButtonPos>
+        <initRow>Cases  VCCIN1  VCCIN2  MemTotal  DIMM  Total</initRow>
+        <chartType>line</chartType>
+        <chartStyle>10</chartStyle>
+        <localDataPath>localProcessData</localDataPath>
+	</Misc>
+</Vp9_Power_Test_Config>
