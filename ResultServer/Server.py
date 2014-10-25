@@ -11,9 +11,11 @@ def initEnv():
     global myConfig
     myConfig = testConfig()
     mkResFolderCMD = "mkdir " + myConfig.resultFolder
-    mkRawDataPath = "mkdir " + myConfig.rawDataStoreFolder
+    mkRawDataFolderCMD = "mkdir " + myConfig.rawDataStoreFolder
+    mkLogFolderCMD = "mkdir " + myConfig.LogFilePath
     os.system(mkResFolderCMD)
-    os.system(mkRawDataPath)
+    os.system(mkRawDataFolderCMD)
+    os.system(mkLogFolderCMD)
 
 def postProcess():
     common.appendLog("backup the raw lvm data...")

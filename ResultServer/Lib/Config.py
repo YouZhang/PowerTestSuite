@@ -29,3 +29,4 @@ class testConfig(object):
         self.initRow = tuple(configFile.getSysConfigItem("Misc","initRow").split())
         self.chartType = configFile.getSysConfigItem("Misc","chartType")
         self.chartStyle = int(configFile.getSysConfigItem("Misc","chartStyle"))
+        self.LogFilePath = configFile.getSysConfigItem("Misc","LogPath")
