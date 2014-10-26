@@ -1,13 +1,32 @@
 #coding = utf-8
-
-
-import time
 import os
 import re
 import win32api
 import win32con
 import time
 from win32api import GetSystemMetrics
+from xml.etree import ElementTree as ET
+
+class sysConfigFile(object):
+
+    def __init__(self,xmlFile = 'sysConfig.xml'):
+        self.rootNode = ET.parse(xmlFile).getroot()
+
+    def getSysConfigItem(self,*args):
+        item = self.rootNode.find(args[0])
+        for i in range(1,len(args)):
+            item = item.find(args[i])
+        return item
+
+    def getConfigContent(self,*args):
+        item = self.getSysConfigItem(*args)
+        return item.text
+
+    def getConfigTag(self,*args):
+        item = self.getSysConfigItem(*args)
+        return item.tag
+
+configFile = sysConfigFile()
 
 VK_CODE = {
     'backspace':0x08,
@@ -155,7 +174,8 @@ VK_CODE = {
     '[':0xDB,
     '\\':0xDC,
     ']':0xDD,
-    "'":0xDE,}
+    "'":0xDE
+}
 
 def switchTo4K():
     win32api.keybd_event(VK_CODE['win'],0,0,0)
@@ -195,17 +215,18 @@ def parseClipInfo(clip):
     tileNum = 1
     matchedCase = ".*_(\d{4})p_(\d{2})fps_\w+_(\d+)f_(.{0,9})(\d+)kbps"
     patten = re.compile(matchedCase)
-    matchedItem = patten.match(clip,0)
-    resolution = matchedItem.group(1)
-    targetFPS = matchedItem.group(2)
-    frameNum = matchedItem.group(3)
-    return resolution,targetFPS,frameNum
+    try:
+        matchedItem = patten.match(clip,0)
+        resolution = matchedItem.group(1)
+        targetFPS = matchedItem.group(2)
+        frameNum = matchedItem.group(3)
+        return resolution,targetFPS,frameNum
+    except:
+        appendLog("the clip name do not match the standard..please check")
+        return -1
 
 def is4kMetric():
-    width = 0
-    height = 0
     width = GetSystemMetrics(0)
-    height = GetSystemMetrics(1)
     if(width > 2000):
         return True
     else:
