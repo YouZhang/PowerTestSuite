@@ -3,11 +3,12 @@ import socket
 import sys
 import os
 import time
-sys.path.append("Lib")
+sys.path.append("Lib_1.0")
 from common import appendLog
 from App import *
 from multiprocessing import Process,Pipe
 import csv
+import Diagram
 
 runList = os.path.join("RunList","list_ToRun.txt")
 doneList = os.path.join("RunList","list_done.txt")
@@ -79,16 +80,18 @@ def postProcess(clip):
             gpuUsage = line[2].rstrip()
             appendLog(gpuUsage)
 
-
-    fps = "0"
     fpsReport = clip + '.txt'
     logFp = file(fpsReport)
     contents = logFp.read()
-    posStart = contents.rindex("(")
-    posEnd = contents.rindex("fps")
-    fps = contents[posStart+1:posEnd -1]
-    appendLog( "fps : %s" % fps)
-
+    try:
+        posStart = contents.rindex("(")
+        posEnd = contents.rindex("fps")
+        fps = contents[posStart+1:posEnd -1]
+        appendLog( "fps : %s" % fps)
+    except:
+        appendLog("App hang and fps could mot be found in the log..")
+        fps = "XXXX"
+    return fps,gpuUsage,cpuUsage
 
 def runSocWatchBat(batFileName,conn):
     cmd = "cmd /c start %s" % batFileName
@@ -99,9 +102,14 @@ def initEnv():
     cleanCMD = "del *.bin"
     os.system(cleanCMD)
 
+initRow = ("Cases","CPU","GPU","FPS")
+resultFile = common.localTime + ".xlsx"
+myDiagram = Diagram.diagram(resultFile,initRow)
+
 if __name__ == "__main__":
 
     initEnv()
+
     while True:
 
         addStartupService()
@@ -140,34 +148,41 @@ if __name__ == "__main__":
                 clipLength = int(frameNum) / int (targetFPS)
                 batFileName =  clipNameToRun + '.bat'
                 MVPCmd = "MVP_Agent.exe -t " + batFileName
+                sock.sendto(clipNameToRun, address)
+                os.system(MVPCmd)
+                sock.sendto(clipNameToRun,address)
+                fps,gpuUsage,cpuUsage = postProcess(clipNameToRun)
 
+                # mvpData = (clipNameToRun,cpuUsage,gpuUsage,fps)
+                # myDiagram.addData(mvpData)
                 # socWatchCMD = 'app\socwatch.lnk -t %s --max-detail -f ddr-bw  -f cpu-cstate -f cpu-pstate -f gfx-cstate -f gfx-pstate  -f sys  -f energy -o C:\Users\sas-shs\Desktop\VP9\PowerTestSuite\TestClient\%s' % (clipLength,clipNameToRun)
                 # appendLog(socWatchCMD)
                 # socWatchBat = "socWatch_" + clipNameToRun + '.bat'
                 
                 # socWatchProc = Process(target=runSocWatchBat,args=(socWatchCMD,childConn))
-                MVPProc = Process(target=runMVPCmd,args=(MVPCmd,clipNameToRun,childConn))
                 # socWatchProc.start()
-                MVPProc.start()
-                while True:
-                    if(parentConn.recv() == "done"):
-                        break
+                #####################
+                # MVPProc = Process(target=runMVPCmd,args=(MVPCmd,clipNameToRun,childConn))
+                # MVPProc.start()
+                # while True:
+                #     if(parentConn.recv() == "done"):
+                #         break
                 appendLog("%s  power test end..." % clipNameToRun)				
                 context = ''.join(clipsToRunList[1:len(clipsToRunList)])
                 listToRunWriteHandle = open('RunList\List_ToRun.txt','w')
                 listToRunWriteHandle.write(context)
                 listToRunWriteHandle.close()                
-                time.sleep(75)
-                appendLog("will sleep 60s....")
+                time.sleep(30)
+                appendLog("will sleep 70s....")
             appendLog("-------------------------------------------------")
+
             # restartOS()
         else:
             writeClips(doneList,runList)
             sock.sendto("done",address)
             appendLog( "all clips power test done!\nremoving startup service...")
+            # myDiagram.genDiagram()
             # removeStartupService()
             appendLog("Power test finished...")
             sock.close()
             break
-
-

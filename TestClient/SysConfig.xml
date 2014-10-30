@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Vp9_Power_Client_Config version="1.0.0">
 	<Path>
-        <AppPath>..\app</AppPath>
-		<ClipsPath>..\Clips</ClipsPath>
-		<LogPath>..\Log</LogPath>
-		<RegPath>..\reg</RegPath>
+        <AppPath>app</AppPath>
+		<ClipsPath>Clips</ClipsPath>
+		<LogPath>Log</LogPath>
+		<RegPath>reg</RegPath>
 		<RunListPath>RunList</RunListPath>
-        <MVPLogPath>..\MVPLog</MVPLogPath>
+        <MVPLogPath>MVPLog</MVPLogPath>
         <batFilePath>bat</batFilePath>
+        <localProcessPath>localProcess</localProcessPath>
 	</Path>
     <Misc>
 		<GPUReport>clipName_GPU.csv</GPUReport>
 		<CPUReport>clipName_CPU.csv</CPUReport>
-        <IP>10.239.141.154</IP>
+        <IP>10.239.141.144</IP>
         <Port>31500</Port>
+		<PowerConfig>Balanced</PowerConfig>
+        <AppHangService>C:\Users\sas-shs\Desktop\VP9\PowerTestSuite\TestClient\Lib_2.0\cpuMonitor.py</AppHangService>
 	</Misc>
     <AppConfig>
         <fixedPlayback>
             <AppName>mv_decoder_adv</AppName>
-            <AppPath>..\app</AppPath>
+            <AppPath>app</AppPath>
             <AppBin>mv_decoder_adv_1011.exe</AppBin>
             <Decoder>VP9</Decoder>
             <File>Input</File>
@@ -52,7 +55,7 @@
                     <cmd></cmd>
                     <length cmd="--limit">frameNum</length>
                     <fps cmd="--fps targetFPS ">
-                        <F24>flim</F24>
+                        <F24>film</F24>
                         <F30>ntsc</F30>
                         <F60>ntsc60</F60>
                         <F120>ntsc120</F120>
