@@ -6,7 +6,6 @@ import win32con
 import time
 from win32api import GetSystemMetrics
 from xml.etree import ElementTree as ET
-import string
 
 class sysConfigFile(object):
 
