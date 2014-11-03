@@ -11,6 +11,7 @@ class appConfig(object):
         appPath = configFile.getConfigContent("AppConfig",mode,"AppPath")
         appBin = configFile.getConfigContent("AppConfig",mode,"AppBin")
         self.appName = configFile.getConfigContent("AppConfig",mode,"AppName")
+        self.regFile = configFile.getConfigContent("AppConfig",mode,"RegFile")
         self.appBinary = os.path.join(appPath,appBin) + " "
         self.param = {}
         self.param["decoder"] = configFile.getConfigContent("AppConfig",mode,"Decoder")
@@ -22,7 +23,6 @@ class testConfig(object):
 
     def __init__(self):
         MVPLogBasePath = configFile.getConfigContent("Path","MVPLogPath")
-        regPath = configFile.getConfigContent("Path","RegPath")
         logPath = configFile.getConfigContent("Path","LogPath")
         runListPath = configFile.getConfigContent("Path","RunListPath")
         ip = configFile.getConfigContent("Misc","IP")
@@ -31,7 +31,6 @@ class testConfig(object):
         self.appPath = configFile.getConfigContent("Path","AppPath")
         # self.testAppConfig = appConfig("fixedPlayback")
         self.clipsPath = configFile.getConfigContent("Path","ClipsPath")
-        self.regFile = os.path.join(regPath,"vp9h.reg")
         self.logFile = os.path.join(logPath,common.localTime+".txt")
         self.todoList = os.path.join(runListPath,"List_ToRun.txt")
         self.doneList = os.path.join(runListPath,"List_Done.txt")
@@ -40,9 +39,10 @@ class testConfig(object):
         self.localProcessFolder = configFile.getConfigContent("Path","localProcessPath")
         self.powerConfig = configFile.getConfigContent("Misc","PowerConfig")
         self.hangService = configFile.getConfigContent("Misc","AppHangService")
+        self.MVP = configFile.getConfigContent("Misc","MVP")
 
 myClientTestCfg = testConfig()
-myAppCfg = appConfig("fixedPlayback")
+myAppCfg = appConfig("HEVCFixedPlayback")
 
 if __name__ == "__main__":
     configFile.getSysConfigItem("Apps","mv_decoder_adv")

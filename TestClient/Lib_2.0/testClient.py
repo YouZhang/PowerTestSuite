@@ -5,12 +5,8 @@ from common import *
 import csv
 from App import App
 import time
-from Diagram import diagram
 
-
-initRow = ("Cases","CPU","GPU","FPS")
-resultFile = localTime + ".xlsx"
-myDiagram = diagram(resultFile,initRow,"bar",10)
+pwd = os.getcwd()
 tempFolder = 'localProcess'
 
 def switchDisplay(clipResolution):
@@ -19,6 +15,17 @@ def switchDisplay(clipResolution):
     if(clipResolution == "1080" and is4kMetric() ):
         switchTo1080()
 
+def addStartupService():
+    command = 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /v Client /t reg_sz /d "%s\PowerTestClient.py" /f' % pwd
+    os.system(command)
+
+def removeStartupService():
+    command = 'reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /v client /f'
+    os.system(command)
+
+def restartOS():
+    command = 'shutdown -r'
+    os.system(command)
 
 def postProcess(clip):
     tempMVPFolder = os.path.join(tempFolder,clip)
@@ -70,12 +77,16 @@ def getGPUUsage(gpuReport):
 
 def getFpsInfo(fpsReport):
     try:
-        logFp = file(fpsReport)
-        contents = logFp.read()
-        posStart = contents.rindex("(")
-        posEnd = contents.rindex("fps")
-        fps = contents[posStart+1:posEnd -1]
-        appendLog( "fps : %s" % fps)
+        contents = open(fpsReport,"r").read()
+        pos = contents.rindex("fps") - 20
+        if("mfx" in contents):
+            patten = ".+ (\d+\.\d+) fps"
+            fps = matchCase(contents,patten,pos)
+            appendLog( "fps : %s" % fps)
+        else:
+            patten = ".+\((\d+\.\d+) fps"
+            fps = matchCase(contents,patten,pos)
+            appendLog( "fps : %s" % fps)
     except:
         appendLog("App hang and fps could mot be found in the log..")
         fps = None
@@ -124,7 +135,7 @@ class testClient(object):
         return caseToRunList,runCase
 
     def runReg(self):
-        cmd = "regedit /S %s" % self.testCfg.regFile
+        cmd = "regedit /S %s" % myAppCfg.regFile
         os.system(cmd)
 
     def setPowerConfig(self):
@@ -145,7 +156,10 @@ class testClient(object):
     def run(self):
         self.setPowerConfig()
         self.runReg()
-        syncRun(self.testCfg.hangService)
+        appendLog("adding the script into OS start up option...")
+        addStartupService()
+        appendLog("starting the app hang monitor service...")
+        syncRun(self.testCfg.hangService.replace("pwd",pwd))
         while True:
             caseToRunList,clipNameToRun = self.getRunCase()
             if( caseToRunList ):
@@ -161,24 +175,24 @@ class testClient(object):
                     appendLog("%s  power test end..." % clipNameToRun)
                     self.removeDoneCase(caseToRunList)
                 else:
-                    clipResolution,targetFPS,frameNum = parseClipInfo(clipNameToRun)
-                    batFileName = self.testApp.genBatFile(clipNameToRun,targetFPS,"fixedPlayback")
+                    clipResolution,targetFPS,frameNum,tenBitOpt = parseClipInfo(clipNameToRun)
+                    batFileName = self.testApp.genBatFile(clipNameToRun,targetFPS,tenBitOpt,"fixedPlayback")
                     switchDisplay(clipResolution)
                     clipLength = int(frameNum) / int (targetFPS)
                     appendLog("clip length : %s" % clipLength)
-                    MVPCmd = "MVP_Agent.exe -t %s" % batFileName
-                    time.sleep(20)
-                    self.sock.sendto(clipNameToRun,self.testCfg.address)
-                    os.system(MVPCmd)
-                    self.sock.sendto(clipNameToRun,self.testCfg.address)
-                    appendLog("%s  power test end..." % clipNameToRun)
+                    time.sleep(40)
+                    if( self.testCfg.MVP == "True"):
+                        MVPCmd = "MVP_Agent.exe -t %s" % batFileName
+                        self.sock.sendto(clipNameToRun,self.testCfg.address)
+                        os.system(MVPCmd)
+                        self.sock.sendto(clipNameToRun,self.testCfg.address)
+                        appendLog("%s  power test end..." % clipNameToRun)
+                    else:
+                        os.system(batFileName)
                     fps,gpuUsage,cpuUsage = postProcess(clipNameToRun)
                     if( fps != None):
                         self.removeDoneCase(caseToRunList)
-                        data = [clipNameToRun,fps,gpuUsage,cpuUsage]
-                        myDiagram.addData(data)
-                        time.sleep(60)
-                        appendLog("will sleep 70s....")
+                        restartOS()
                 appendLog("-------------------------------------------------")
             else:
                 self.writeRunList()
@@ -186,6 +200,6 @@ class testClient(object):
                 appendLog( "all clips power test done!\nremoving startup service...")
                 appendLog("Power test finished...")
                 self.sock.close()
-                myDiagram.addDiagram("B")
-                myDiagram.genDiagram()
+                removeStartupService()
+                os.system("localCalculate.py")
                 break

@@ -214,18 +214,24 @@ def appendLog(message):
 
 
 def parseClipInfo(clip):
-    tileNum = 1
-    matchedCase = ".*_(\d{4})p_(\d{2})fps_\w+_(\d+)f_(.{0,9})(\d+)kbps"
-    patten = re.compile(matchedCase)
+    resMatchedCase = ".*(\d{4})p.*"
+    fpsMatchedCase = ".*(\d{2,3})fps.*"
+    frameMatchedCase = ".*(\d{4,5})frame.*"
+    tenBitMatchedCase = ".*m(\d{1,2}).*"
     try:
-        matchedItem = patten.match(clip,0)
-        resolution = matchedItem.group(1)
-        targetFPS = matchedItem.group(2)
-        frameNum = matchedItem.group(3)
-        return resolution,targetFPS,frameNum
+        resolution = matchCase(clip,resMatchedCase)
+        targetFPS = matchCase(clip,fpsMatchedCase)
+        frameNum = matchCase(clip,frameMatchedCase)
+        tenBit = matchCase(clip,tenBitMatchedCase)
+        return resolution,targetFPS,frameNum,tenBit
     except:
         appendLog("the clip name do not match the standard..please check")
         return -1
+
+def matchCase(content,patten,pos=0):
+    patten = re.compile(patten)
+    matchedItem = patten.match(content,pos)
+    return matchedItem.group(1)
 
 def is4kMetric():
     width = GetSystemMetrics(0)
@@ -263,15 +269,16 @@ def syncRun(fileName):
     win32api.keybd_event(VK_CODE['enter'],0,win32con.KEYEVENTF_KEYUP,0)
     win32api.keybd_event(VK_CODE['ctrl'],0,win32con.KEYEVENTF_KEYUP,0)
     win32api.keybd_event(VK_CODE['left_shift'],0,0,0)
-    time.sleep(10)
+    time.sleep(0.2)
     win32api.keybd_event(VK_CODE['left_arrow'],0,win32con.KEYEVENTF_KEYUP,0)
     win32api.keybd_event(VK_CODE['left_arrow'],0,0,0)
     win32api.keybd_event(VK_CODE['enter'],0,0,0)
     win32api.keybd_event(VK_CODE['enter'],0,win32con.KEYEVENTF_KEYUP,0)
-    time.sleep(5)
+    time.sleep(0.2)
     keyPress(fileName)
+    time.sleep(0.2)
     win32api.keybd_event(VK_CODE['enter'],0,0,0)
     win32api.keybd_event(VK_CODE['enter'],0,win32con.KEYEVENTF_KEYUP,0)
 
 if __name__ == "__main__":
-    syncRun('C:\\Users\\sas-shs\\Desktop\\VP9\\PowerTestSuite\\TestClient\\Lib_2.0\\cpuMonitor.py')
+    syncRun('C:\Users\You\Documents\GitHub\PowerTestSuite\TestClient\Lib_2.0\cpuMonitor.py')

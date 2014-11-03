@@ -39,9 +39,15 @@ class App(object):
             if( targetFPS in opt.tag ):
                 return opt.text
 
-    def genBatFile(self,clipName,targetFPS,mode):
+    def genTenBitParam(self,targetTenBit):
+        tenBitOpt = self.optionsItem.find("File").find("Bit10")
+        if( targetTenBit in tenBitOpt.tag):
+            self.param += tenBitOpt.text
+
+    def genBatFile(self,clipName,targetFPS,tenBitOpt,mode):
+        self.genTenBitParam(tenBitOpt)
         cmd = self.appConfig.appBinary + self.param + " > log.txt"
-        clip = os.path.join(myClientTestCfg.clipsPath,clipName+".webm")
+        clip = os.path.join(myClientTestCfg.clipsPath,clipName)
         fpsOpt = self.getFPSParam(targetFPS,mode)
         cmd = cmd.replace("clipName",clip).replace("targetFPS",fpsOpt).replace("log",clipName)
         batFile = os.path.join(myClientTestCfg.batFilePath,clipName+".bat")
@@ -49,7 +55,6 @@ class App(object):
         handle.write(cmd)
         handle.close()
         return batFile
-
 
 if __name__ == "__main__":
     pass
