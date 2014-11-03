@@ -29,7 +29,6 @@ class testConfig(object):
         port = int(configFile.getConfigContent("Misc","Port"))
         self.address = (ip,port)
         self.appPath = configFile.getConfigContent("Path","AppPath")
-        # self.testAppConfig = appConfig("fixedPlayback")
         self.clipsPath = configFile.getConfigContent("Path","ClipsPath")
         self.logFile = os.path.join(logPath,common.localTime+".txt")
         self.todoList = os.path.join(runListPath,"List_ToRun.txt")
