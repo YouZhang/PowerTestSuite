@@ -4,8 +4,8 @@
         <AppPath>app</AppPath>
 		<ClipsPath>Clips</ClipsPath>
 		<LogPath>Log</LogPath>
-		<RunListPath>RunList</RunListPath>
         <MVPLogPath>MVPLog</MVPLogPath>
+		<RunListPath>RunList</RunListPath>
         <batFilePath>bat</batFilePath>
         <localProcessPath>localProcess</localProcessPath>
 	</Path>
@@ -15,8 +15,10 @@
         <IP>10.239.141.232</IP>
         <Port>31500</Port>
 		<PowerConfig>Balanced</PowerConfig>
-        <AppHangService>pwd\Lib_2.0\cpuMonitor.py</AppHangService>
+        <AppHangService>pwd\Lib_2.0\appHangMonitor.bat</AppHangService>
         <MVP>True</MVP>
+        <RestartSvr>False</RestartSvr>
+        <SocWatch>False</SocWatch>
 	</Misc>
     <AppConfig>
         <VP9FixedPlayback>
@@ -29,6 +31,16 @@
             <Display>cmd Fullscreen  overlay</Display>
             <Control>fps</Control>
         </VP9FixedPlayback>
+        <VP9FreePlayback>
+            <AppName>mv_decoder_adv</AppName>
+            <AppPath>app\mv_decoder_adv</AppPath>
+            <AppBin>mv_decoder_adv_1011.exe</AppBin>
+            <RegFile>reg\vp9h.reg</RegFile>
+            <Decoder>VP9</Decoder>
+            <File>Input</File>
+            <Display>cmd Fullscreen</Display>
+            <Control>fps</Control>
+        </VP9FreePlayback>
         <HEVCFixedPlayback>
             <AppName>mfx_player</AppName>
             <AppPath>app\mfx_player</AppPath>
@@ -50,8 +62,9 @@
                 </Decoder>
                 <File>
                     <cmd></cmd>
-                    <Input cmd="-i">clipName.265</Input>
-                    <Output cmd="-o">dumpFile.webm</Output>
+                    <Input cmd="-i">clipName.webm</Input>
+                    <Output cmd="-o">dumpFile.yuv</Output>
+                    <Bit10>-backbuffer D3DFMT_A2R10G10B10</Bit10>
                 </File>
                 <Display>
                     <cmd>--disp</cmd>
@@ -61,7 +74,6 @@
                         <flipex>--flipex</flipex>
                         <overlay>--overlay</overlay>
                     </Method>
-                    <Bit10>-backbuffer D3DFMT_A2R10G10B10</Bit10>
                 </Display>
                 <Control>
                     <cmd></cmd>
@@ -89,7 +101,7 @@
                         <hevc cmd="-i:hevc">clipName.265</hevc>
                         <vp9 cmd="-i:webm">clipName.webm</vp9>
                     </Input>
-                    <Output cmd="-o:oFormat">dumpFile</Output>
+                    <Output cmd="-o:oFormat">dumpFile.yuv</Output>
                     <Bit10>-backbuffer D3DFMT_A2R10G10B10</Bit10>
                 </File>
                 <Display>
@@ -104,7 +116,7 @@
                 <Control>
                     <cmd></cmd>
                     <length cmd="-n">frameNum</length>
-                    <fps cmd="--fps targetFPS ">
+                    <fps cmd="-fps targetFPS ">
                         <F24>24</F24>
                         <F30>30</F30>
                         <F60>60</F60>

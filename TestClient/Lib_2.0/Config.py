@@ -2,8 +2,9 @@
 
 import os
 import common
-from common import configFile
+from common import sysConfigFile
 
+configFile = sysConfigFile()
 
 class appConfig(object):
 
@@ -12,6 +13,7 @@ class appConfig(object):
         appBin = configFile.getConfigContent("AppConfig",mode,"AppBin")
         self.appName = configFile.getConfigContent("AppConfig",mode,"AppName")
         self.regFile = configFile.getConfigContent("AppConfig",mode,"RegFile")
+        self.optionsItem = configFile.getSysConfigItem("Apps",self.appName,"Options")
         self.appBinary = os.path.join(appPath,appBin) + " "
         self.param = {}
         self.param["decoder"] = configFile.getConfigContent("AppConfig",mode,"Decoder")
@@ -39,9 +41,10 @@ class testConfig(object):
         self.powerConfig = configFile.getConfigContent("Misc","PowerConfig")
         self.hangService = configFile.getConfigContent("Misc","AppHangService")
         self.MVP = configFile.getConfigContent("Misc","MVP")
+        self.restartSvr = configFile.getConfigContent("Misc","RestartSvr")
+        self.socWatch = configFile.getConfigContent("Misc","SocWatch")
 
-myClientTestCfg = testConfig()
-myAppCfg = appConfig("HEVCFixedPlayback")
+
 
 if __name__ == "__main__":
     configFile.getSysConfigItem("Apps","mv_decoder_adv")

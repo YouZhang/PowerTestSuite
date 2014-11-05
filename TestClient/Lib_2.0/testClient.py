@@ -1,7 +1,8 @@
 #coding = utf-8
 import socket
-from Config import myAppCfg
-from common import *
+from Config import appConfig
+import os
+from common import syncRun,switchTo1080,switchTo4K,is4kMetric,appendLog,matchCase,parseClipInfo
 import csv
 from App import App
 import time
@@ -16,7 +17,7 @@ def switchDisplay(clipResolution):
         switchTo1080()
 
 def addStartupService():
-    command = 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /v Client /t reg_sz /d "%s\PowerTestClient.py" /f' % pwd
+    command = 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /v Client /t reg_sz /d "%s\\run.bat" /f' % pwd
     os.system(command)
 
 def removeStartupService():
@@ -92,12 +93,22 @@ def getFpsInfo(fpsReport):
         fps = None
     return fps
 
+def genSocWatchBat(clipName,clipLength):
+    Cmd = '%s\\app\socwatch.lnk -t %s --max-detail -f ddr-bw  -f cpu-cstate -f cpu-pstate -f gfx-cstate -f gfx-pstate -f sys -o %s\socRes\%s' % (pwd,clipLength,pwd,clipName)
+    batFileName = '%s\socWatchBat\soc.bat' % pwd
+    fileHandle = open(batFileName,'w')
+    fileHandle.write(Cmd)
+    fileHandle.close()
+    return batFileName
+
 class testClient(object):
 
-    def __init__(self,testCfg):
+    def __init__(self,testCfg,appCfgOpt):
+        self.myAppCfg = appConfig(appCfgOpt)
+        self.appCfgOpt = appCfgOpt
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.testCfg = testCfg
-        self.testApp = App(myAppCfg)
+        self.testApp = App(self.myAppCfg)
         self.testApp.genCMDParam()
 
     def writeRunList(self):
@@ -124,7 +135,7 @@ class testClient(object):
             state,case = caseToRunList[0].split()
         except:
             appendLog("empty list ...")
-            return None
+            return None,None
 
         while True:
             if( state == "1"):
@@ -135,7 +146,7 @@ class testClient(object):
         return caseToRunList,runCase
 
     def runReg(self):
-        cmd = "regedit /S %s" % myAppCfg.regFile
+        cmd = "regedit /S %s" % self.myAppCfg.regFile
         os.system(cmd)
 
     def setPowerConfig(self):
@@ -153,9 +164,11 @@ class testClient(object):
         appendLog("Current power config : %s mode" % myPowerConfig)
         os.system(setPowerCfgCmd)
 
+
+
     def run(self):
         self.setPowerConfig()
-        self.runReg()
+        # self.runReg()
         appendLog("adding the script into OS start up option...")
         addStartupService()
         appendLog("starting the app hang monitor service...")
@@ -176,23 +189,35 @@ class testClient(object):
                     self.removeDoneCase(caseToRunList)
                 else:
                     clipResolution,targetFPS,frameNum,tenBitOpt = parseClipInfo(clipNameToRun)
-                    batFileName = self.testApp.genBatFile(clipNameToRun,targetFPS,tenBitOpt,"fixedPlayback")
+                    batFileName = self.testApp.genBatFile(clipNameToRun,targetFPS,tenBitOpt,self.appCfgOpt)
                     switchDisplay(clipResolution)
                     clipLength = int(frameNum) / int (targetFPS)
                     appendLog("clip length : %s" % clipLength)
-                    time.sleep(40)
+                    time.sleep(45)
                     if( self.testCfg.MVP == "True"):
                         MVPCmd = "MVP_Agent.exe -t %s" % batFileName
                         self.sock.sendto(clipNameToRun,self.testCfg.address)
                         os.system(MVPCmd)
                         self.sock.sendto(clipNameToRun,self.testCfg.address)
                         appendLog("%s  power test end..." % clipNameToRun)
+                        fps,gpuUsage,cpuUsage = postProcess(clipNameToRun)
                     else:
+                        if(self.testCfg.socWatch == "True"):                            
+                            appendLog("starting the SocWatch...")					
+                            socWatchBat = genSocWatchBat(clipNameToRun,clipLength)
+                            syncRun(socWatchBat)
+                            time.sleep(5)
                         os.system(batFileName)
-                    fps,gpuUsage,cpuUsage = postProcess(clipNameToRun)
+                        fps = getFpsInfo(clipNameToRun+".txt")
                     if( fps != None):
                         self.removeDoneCase(caseToRunList)
+                    else:
+                        rmBatFileCmd = 'del bat\%s.bat' % batFileName
+                        os.system(rmBatFileCmd)
+                    if(self.testCfg.restartSvr == "True"):
                         restartOS()
+                    else:
+                        time.sleep(45)
                 appendLog("-------------------------------------------------")
             else:
                 self.writeRunList()

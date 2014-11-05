@@ -26,7 +26,6 @@ class sysConfigFile(object):
         item = self.getSysConfigItem(*args)
         return item.tag
 
-configFile = sysConfigFile()
 localTime = time.strftime("%Y-%m-%d_%H-%M-%S",time.localtime())
 
 VK_CODE = {
@@ -213,10 +212,10 @@ def appendLog(message):
 
 
 def parseClipInfo(clip):
-    resMatchedCase = ".*(\d{4})p.*"
-    fpsMatchedCase = ".*(\d{2,3})fps.*"
-    frameMatchedCase = ".*(\d{4,5})frame.*"
-    tenBitMatchedCase = ".*m(\d{1,2}).*"
+    resMatchedCase = ".*_(\d+)p.*"
+    fpsMatchedCase = ".*_(\d+)fps.*"
+    frameMatchedCase = ".*_(\d+)frame.*"
+    tenBitMatchedCase = ".*_m(\d+).*"
     try:
         resolution = matchCase(clip,resMatchedCase)
         targetFPS = matchCase(clip,fpsMatchedCase)
@@ -257,27 +256,8 @@ def keyPress(targetStr):
             win32api.keybd_event(VK_CODE[target],0,win32con.KEYEVENTF_KEYUP,0)
 
 def syncRun(fileName):
-    win32api.keybd_event(VK_CODE['win'],0,0,0)
-    win32api.keybd_event(VK_CODE['win'],0,win32con.KEYEVENTF_KEYUP,0)
-    time.sleep(0.2)
-    keyPress("cmd")
-    time.sleep(0.2)
-    win32api.keybd_event(VK_CODE['ctrl'],0,0,0)
-    win32api.keybd_event(VK_CODE['left_shift'],0,win32con.KEYEVENTF_KEYUP,0)
-    win32api.keybd_event(VK_CODE['enter'],0,0,0)
-    win32api.keybd_event(VK_CODE['enter'],0,win32con.KEYEVENTF_KEYUP,0)
-    win32api.keybd_event(VK_CODE['ctrl'],0,win32con.KEYEVENTF_KEYUP,0)
-    win32api.keybd_event(VK_CODE['left_shift'],0,0,0)
-    time.sleep(0.2)
-    win32api.keybd_event(VK_CODE['left_arrow'],0,win32con.KEYEVENTF_KEYUP,0)
-    win32api.keybd_event(VK_CODE['left_arrow'],0,0,0)
-    win32api.keybd_event(VK_CODE['enter'],0,0,0)
-    win32api.keybd_event(VK_CODE['enter'],0,win32con.KEYEVENTF_KEYUP,0)
-    time.sleep(0.2)
-    keyPress(fileName)
-    time.sleep(0.2)
-    win32api.keybd_event(VK_CODE['enter'],0,0,0)
-    win32api.keybd_event(VK_CODE['enter'],0,win32con.KEYEVENTF_KEYUP,0)
+    cmd = 'runas /savecred /user:administrator ' + fileName
+    os.system(cmd)
 
 if __name__ == "__main__":
-    syncRun('C:\Users\You\Documents\GitHub\PowerTestSuite\TestClient\Lib_2.0\cpuMonitor.py')
+    syncRun('C:\Users\sas-shs\Desktop\VP9\PowerTestSuite\TestClient\socWatchBat\soc.bat')
