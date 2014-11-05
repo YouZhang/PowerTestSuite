@@ -119,8 +119,9 @@ class testClient(object):
         toRunListHandle.close()
         doneListHandle.close()
 
-    def removeDoneCase(self,clipsToRunList):
-        context = ''.join(clipsToRunList[1:len(clipsToRunList)])
+    def removeDoneCase(self,clipsToRunList,clipNameToRun):
+        clipsToRunList.remove('1\t'+clipNameToRun+'\n')
+        context = ''.join(clipsToRunList)
         listToRunWriteHandle = open(self.testCfg.todoList,'w')
         listToRunWriteHandle.write(context)
         listToRunWriteHandle.close()
@@ -131,18 +132,16 @@ class testClient(object):
         listToRunReadHandle = open(self.testCfg.todoList,'r')
         caseToRunList = listToRunReadHandle.readlines()
         listToRunReadHandle.close()
-        try:
-            state,case = caseToRunList[0].split()
-        except:
-            appendLog("empty list ...")
-            return None,None
-
-        while True:
-            if( state == "1"):
-                runCase = case
-                break
-            i += 1
-            state,case = caseToRunList[i].split()
+        while(i < len(caseToRunList)):
+            try:
+                state,case = caseToRunList[i].split()
+                if( state == "1"):
+                    runCase = case
+                    break
+                i += 1
+            except:
+                appendLog("empty list ...")
+                return None,None
         return caseToRunList,runCase
 
     def runReg(self):
@@ -164,8 +163,6 @@ class testClient(object):
         appendLog("Current power config : %s mode" % myPowerConfig)
         os.system(setPowerCfgCmd)
 
-
-
     def run(self):
         self.setPowerConfig()
         # self.runReg()
@@ -175,18 +172,18 @@ class testClient(object):
         syncRun(self.testCfg.hangService.replace("pwd",pwd))
         while True:
             caseToRunList,clipNameToRun = self.getRunCase()
-            if( caseToRunList ):
+            if( clipNameToRun != None ):
                 appendLog("Current test clip : %s" % clipNameToRun)
                 if("end" in clipNameToRun):
                     self.sock.sendto(clipNameToRun,self.testCfg.address)
                     appendLog("%s  power test end..." % clipNameToRun)
-                    self.removeDoneCase(caseToRunList)
+                    self.removeDoneCase(caseToRunList,clipNameToRun)
                 elif("back" in clipNameToRun):
                     self.sock.sendto(clipNameToRun,self.testCfg.address)
                     time.sleep(180)
                     self.sock.sendto(clipNameToRun, self.testCfg.address)
                     appendLog("%s  power test end..." % clipNameToRun)
-                    self.removeDoneCase(caseToRunList)
+                    self.removeDoneCase(caseToRunList,clipNameToRun)
                 else:
                     clipResolution,targetFPS,frameNum,tenBitOpt = parseClipInfo(clipNameToRun)
                     batFileName = self.testApp.genBatFile(clipNameToRun,targetFPS,tenBitOpt,self.appCfgOpt)
@@ -210,7 +207,7 @@ class testClient(object):
                         os.system(batFileName)
                         fps = getFpsInfo(clipNameToRun+".txt")
                     if( fps != None):
-                        self.removeDoneCase(caseToRunList)
+                        self.removeDoneCase(caseToRunList,clipNameToRun)
                     else:
                         rmBatFileCmd = 'del bat\%s.bat' % batFileName
                         os.system(rmBatFileCmd)
