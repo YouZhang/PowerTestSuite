@@ -43,7 +43,7 @@ class powerDataMem(object):
         VCCIN2Power = VCCIN2_dvAve * VCCIN2_VAve / 0.002
         MemPower = Mem_dvAve * Mem_VAve / 0.002
         DIMMPower = DIMM_dvAve * DIMM_VAve / 0.002
-        TotalPower = VCCIN1Power + VCCIN2Power + MemPower
+        TotalPower = VCCIN1Power + VCCIN2Power + MemPower - DIMMPower
         return [VCCIN1Power, VCCIN2Power, MemPower, DIMMPower,TotalPower]
 
 
@@ -52,7 +52,8 @@ class powerProcessor(object):
     def __init__(self, powerDataMem,myConfig):
         self.powerMem = powerDataMem
         self.inputRawData = myConfig.rawDataFilePath
-        self.resultDiagram = diagram(myConfig.resultFile,myConfig.initRow,myConfig.chartType,myConfig.chartStyle)
+        self.chartType = myConfig.chartType
+        self.resultDiagram = diagram(myConfig.resultFile,myConfig.initRow,myConfig.chartType)
         self.address = myConfig.address
         self.startButtonPos = myConfig.startButtonPos
         self.stopButtonPos = myConfig.stopButtonPos
@@ -112,7 +113,7 @@ class powerProcessor(object):
                 self.powerMem.__init__()
                 common.appendLog("--------------------------------------------------------------")
         self.sock.close()
-        self.resultDiagram.addDiagram(self.targetDataPos)
+        self.resultDiagram.addDiagram("PowerData",self.targetDataPos,self.chartType)
         self.resultDiagram.genDiagram()
 
     def localProcess(self,lvmFileList):
@@ -120,13 +121,13 @@ class powerProcessor(object):
         for lvmFile in lvmFileList:
             common.appendLog("processing %s ..." % lvmFile)
             powerData = self.getDataFromLVM(lvmFile)
-            message = "VCCIN1 : %s\nVCCIN2 : %s\nMemToal : %s\nDIMM : %s\nTotalPower:%s" % tuple(powerData)
+            message = "VCCIN1 : %s\nVCCIN2 : %s\nMemTotal : %s\nDIMM : %s\nTotalPower:%s" % tuple(powerData)
             common.appendLog(message)
             powerData.insert(0,lvmFile)
             self.resultDiagram.addData(powerData)
             common.appendLog("--------------------------------------------------------------")
             self.powerMem.__init__()
-        self.resultDiagram.addDiagram(self.targetDataPos)
+        self.resultDiagram.addDiagram("PowerData",self.targetDataPos,self.chartType)
         self.resultDiagram.genDiagram()
 
 def renameFile(beforeName,newName):

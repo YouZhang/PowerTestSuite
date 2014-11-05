@@ -27,9 +27,9 @@ def getResult():
 
             data = [dirName,string.atof(cpuUsage),string.atof(gpuUsage),string.atof(fps)]
             myDiagram.addData(data)
-    myDiagram.addDiagram("B","bar")
-    myDiagram.addDiagram("C","bar")
-    myDiagram.addDiagram("D","line")
+    myDiagram.addDiagram("CPU_Usage","B","bar")
+    myDiagram.addDiagram("GPU_Usage","C","bar")
+    myDiagram.addDiagram("FPS","D","line")
     myDiagram.genDiagram()
 
 if __name__ == "__main__":

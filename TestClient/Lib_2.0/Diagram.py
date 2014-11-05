@@ -16,13 +16,16 @@ class diagram(object):
         self.chartInsertPos += 1
         self.workSheet.write_row(self.row,0,data)
 
-    def addDiagram(self,targetDataPos,chartType):
+    def addDiagram(self,chartName,targetDataPos,chartType):
         chart = self.workBook.add_chart({'type': chartType})
+        chart.set_title({'name': chartName})
         series = {
             'categories' : '=Sheet1!$A$2:$A$'+str(self.row + 1) ,
-            'values' : '=Sheet1!$targetDataPos$2:$targetDataPos$'.replace("targetDataPos",targetDataPos) + str(self.row + 1)
+            'values' : '=Sheet1!$targetDataPos$2:$targetDataPos$'.replace("targetDataPos",targetDataPos) + str(self.row + 1),
+            'data_labels': {'value': True}
         }
-        chart.set_legend({'position': 'top'})
+        chart.set_legend({'none': True})
+        # chart.set_legend({'position': 'top'})
         chart.add_series(series)
         chart.set_style(self.chartStyle)
         self.workSheet.insert_chart(self.chartInsertPos + 2,0, chart, {'x_offset': 10, 'y_offset': 10})
