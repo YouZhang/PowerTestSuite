@@ -4,7 +4,6 @@
         <AppPath>app</AppPath>
 		<ClipsPath>Clips</ClipsPath>
 		<LogPath>Log</LogPath>
-        <MVPLogPath>MVPLog</MVPLogPath>
 		<RunListPath>RunList</RunListPath>
         <batFilePath>bat</batFilePath>
         <localProcessPath>localProcess</localProcessPath>
