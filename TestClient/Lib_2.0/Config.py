@@ -24,7 +24,6 @@ class appConfig(object):
 class testConfig(object):
 
     def __init__(self):
-        MVPLogBasePath = configFile.getConfigContent("Path","MVPLogPath")
         logPath = configFile.getConfigContent("Path","LogPath")
         runListPath = configFile.getConfigContent("Path","RunListPath")
         ip = configFile.getConfigContent("Misc","IP")
@@ -35,7 +34,6 @@ class testConfig(object):
         self.logFile = os.path.join(logPath,common.localTime+".txt")
         self.todoList = os.path.join(runListPath,"List_ToRun.txt")
         self.doneList = os.path.join(runListPath,"List_Done.txt")
-        self.MVPLogPath = os.path.join(MVPLogBasePath,common.localTime)
         self.batFilePath = configFile.getConfigContent("Path","batFilePath")
         self.localProcessFolder = configFile.getConfigContent("Path","localProcessPath")
         self.powerConfig = configFile.getConfigContent("Misc","PowerConfig")
