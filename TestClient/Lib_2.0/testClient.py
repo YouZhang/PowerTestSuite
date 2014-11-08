@@ -1,16 +1,15 @@
 #coding = utf-8
 import socket
-from Config import myAppCfg
-from common import *
+from Config import appConfig
+import os
+from common import syncRun,switchTo1080,switchTo4K,is4kMetric,appendLog,matchCase,parseClipInfo
 import csv
 from App import App
 import time
-from Diagram import diagram
+import re
+import string
 
-
-initRow = ("Cases","CPU","GPU","FPS")
-resultFile = localTime + ".xlsx"
-myDiagram = diagram(resultFile,initRow,"bar",10)
+pwd = os.getcwd()
 tempFolder = 'localProcess'
 
 def switchDisplay(clipResolution):
@@ -19,6 +18,17 @@ def switchDisplay(clipResolution):
     if(clipResolution == "1080" and is4kMetric() ):
         switchTo1080()
 
+def addStartupService():
+    command = 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /v Client /t reg_sz /d "%s\\run.bat" /f' % pwd
+    os.system(command)
+
+def removeStartupService():
+    command = 'reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /v client /f'
+    os.system(command)
+
+def restartOS():
+    command = 'shutdown -r'
+    os.system(command)
 
 def postProcess(clip):
     tempMVPFolder = os.path.join(tempFolder,clip)
@@ -39,6 +49,10 @@ def postProcess(clip):
 	
     fpsReport = os.path.join(tempMVPFolder,clip+".txt")
     command = 'move %s.txt %s' %(clip,fpsReport)
+    os.system(command)
+
+    socWatchReport = os.path.join(tempMVPFolder,clip+".csv")
+    command = 'move %s.csv %s' %(clip,socWatchReport)
     os.system(command)
 
     gpuReport = os.path.join(tempMVPFolder,clip+"_GPU_Usage.csv")
@@ -70,23 +84,63 @@ def getGPUUsage(gpuReport):
 
 def getFpsInfo(fpsReport):
     try:
-        logFp = file(fpsReport)
-        contents = logFp.read()
-        posStart = contents.rindex("(")
-        posEnd = contents.rindex("fps")
-        fps = contents[posStart+1:posEnd -1]
-        appendLog( "fps : %s" % fps)
+        contents = open(fpsReport,"r").read()
+        pos = contents.rindex("fps") - 20
+        if("mfx" in contents):
+            patten = ".+ (\d+\.\d+) fps"
+            fps = matchCase(contents,patten,pos)
+            appendLog( "fps : %s" % fps)
+        else:
+            patten = ".+\((\d+\.\d+) fps"
+            fps = matchCase(contents,patten,pos)
+            appendLog( "fps : %s" % fps)
     except:
         appendLog("App hang and fps could mot be found in the log..")
         fps = None
     return fps
 
+def genSocWatchBat(clipName,clipLength):
+    Cmd = '%s\\app\socwatch.lnk -t %s --max-detail -f ddr-bw  -f cpu-cstate -f cpu-pstate -f gfx-cstate -f gfx-pstate -f sys -o %s\socRes\%s' % (pwd,clipLength,pwd,clipName)
+    batFileName = '%s\socWatchBat\soc.bat' % pwd
+    fileHandle = open(batFileName,'w')
+    fileHandle.write(Cmd)
+    fileHandle.close()
+    return batFileName
+
+def calAveFreq(gpuFreqList):
+    temp = 0
+    for dataPair in gpuFreqList:
+        temp = temp + int(dataPair[0]) * string.atof(dataPair[1])
+    aveGpuFreq = temp / 100
+    return aveGpuFreq
+
+def getSocRes(socLogFile,*args):
+    result = []
+    fileHandle = open(socLogFile,'r')
+    content = fileHandle.read()
+    fileHandle.close()
+    for opt in args:
+        if( opt in "GPU"):
+            pos = content.index("GT P-State")
+            patten = re.compile("\n(\d+)MHz\s+,\s+(\d+\.\d+)%,.*")
+            gpuFreqList = patten.findall(content,pos)
+            aveGPUFreq = calAveFreq(gpuFreqList)
+            result.append(aveGPUFreq)
+        elif( opt in "CPU"):
+            pos = content.index("AvgFreq")
+            matchedCase = ".*AvgFreq,\s+,\s+(\d+)MHz.*"
+            aveCPUFreq = int(matchCase(content,matchedCase,pos))
+            result.append(aveCPUFreq)
+    return result
+
 class testClient(object):
 
-    def __init__(self,testCfg):
+    def __init__(self,testCfg,appCfgOpt):
+        self.myAppCfg = appConfig(appCfgOpt)
+        self.appCfgOpt = appCfgOpt
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.testCfg = testCfg
-        self.testApp = App(myAppCfg)
+        self.testApp = App(self.myAppCfg)
         self.testApp.genCMDParam()
 
     def writeRunList(self):
@@ -97,8 +151,9 @@ class testClient(object):
         toRunListHandle.close()
         doneListHandle.close()
 
-    def removeDoneCase(self,clipsToRunList):
-        context = ''.join(clipsToRunList[1:len(clipsToRunList)])
+    def removeDoneCase(self,clipsToRunList,clipNameToRun):
+        clipsToRunList.remove('1\t'+clipNameToRun+'\n')
+        context = ''.join(clipsToRunList)
         listToRunWriteHandle = open(self.testCfg.todoList,'w')
         listToRunWriteHandle.write(context)
         listToRunWriteHandle.close()
@@ -109,22 +164,20 @@ class testClient(object):
         listToRunReadHandle = open(self.testCfg.todoList,'r')
         caseToRunList = listToRunReadHandle.readlines()
         listToRunReadHandle.close()
-        try:
-            state,case = caseToRunList[0].split()
-        except:
-            appendLog("empty list ...")
-            return None
-
-        while True:
-            if( state == "1"):
-                runCase = case
-                break
-            i += 1
-            state,case = caseToRunList[i].split()
+        while(i < len(caseToRunList)):
+            try:
+                state,case = caseToRunList[i].split()
+                if( state == "1"):
+                    runCase = case
+                    break
+                i += 1
+            except:
+                appendLog("empty list ...")
+                return None,None
         return caseToRunList,runCase
 
     def runReg(self):
-        cmd = "regedit /S %s" % self.testCfg.regFile
+        cmd = "regedit /S %s" % self.myAppCfg.regFile
         os.system(cmd)
 
     def setPowerConfig(self):
@@ -144,41 +197,56 @@ class testClient(object):
 
     def run(self):
         self.setPowerConfig()
-        self.runReg()
-        syncRun(self.testCfg.hangService)
+        # self.runReg()
+        appendLog("adding the script into OS start up option...")
+        addStartupService()
+        appendLog("starting the app hang monitor service...")
+        syncRun(self.testCfg.hangService.replace("pwd",pwd))
         while True:
             caseToRunList,clipNameToRun = self.getRunCase()
-            if( caseToRunList ):
+            if( clipNameToRun != None ):
                 appendLog("Current test clip : %s" % clipNameToRun)
                 if("end" in clipNameToRun):
                     self.sock.sendto(clipNameToRun,self.testCfg.address)
                     appendLog("%s  power test end..." % clipNameToRun)
-                    self.removeDoneCase(caseToRunList)
+                    self.removeDoneCase(caseToRunList,clipNameToRun)
                 elif("back" in clipNameToRun):
                     self.sock.sendto(clipNameToRun,self.testCfg.address)
                     time.sleep(180)
                     self.sock.sendto(clipNameToRun, self.testCfg.address)
                     appendLog("%s  power test end..." % clipNameToRun)
-                    self.removeDoneCase(caseToRunList)
+                    self.removeDoneCase(caseToRunList,clipNameToRun)
                 else:
-                    clipResolution,targetFPS,frameNum = parseClipInfo(clipNameToRun)
-                    batFileName = self.testApp.genBatFile(clipNameToRun,targetFPS,"fixedPlayback")
+                    clipResolution,targetFPS,frameNum,tenBitOpt = parseClipInfo(clipNameToRun)
+                    batFileName = self.testApp.genBatFile(clipNameToRun,targetFPS,tenBitOpt,self.appCfgOpt)
                     switchDisplay(clipResolution)
                     clipLength = int(frameNum) / int (targetFPS)
                     appendLog("clip length : %s" % clipLength)
-                    MVPCmd = "MVP_Agent.exe -t %s" % batFileName
-                    time.sleep(20)
-                    self.sock.sendto(clipNameToRun,self.testCfg.address)
-                    os.system(MVPCmd)
-                    self.sock.sendto(clipNameToRun,self.testCfg.address)
-                    appendLog("%s  power test end..." % clipNameToRun)
-                    fps,gpuUsage,cpuUsage = postProcess(clipNameToRun)
+                    time.sleep(45)
+                    if( self.testCfg.MVP == "True"):
+                        MVPCmd = "MVP_Agent.exe -t %s" % batFileName
+                        self.sock.sendto(clipNameToRun,self.testCfg.address)
+                        os.system(MVPCmd)
+                        self.sock.sendto(clipNameToRun,self.testCfg.address)
+                        appendLog("%s  power test end..." % clipNameToRun)
+                        fps,gpuUsage,cpuUsage = postProcess(clipNameToRun)
+                    else:
+                        if(self.testCfg.socWatch == "True"):                            
+                            appendLog("starting the SocWatch...")					
+                            socWatchBat = genSocWatchBat(clipNameToRun,clipLength)
+                            syncRun(socWatchBat)
+                            time.sleep(5)
+                        os.system(batFileName)
+                        fps = getFpsInfo(clipNameToRun+".txt")
                     if( fps != None):
-                        self.removeDoneCase(caseToRunList)
-                        data = [clipNameToRun,fps,gpuUsage,cpuUsage]
-                        myDiagram.addData(data)
-                        time.sleep(60)
-                        appendLog("will sleep 70s....")
+                        self.removeDoneCase(caseToRunList,clipNameToRun)
+                    else:
+                        rmBatFileCmd = 'del bat\%s.bat' % batFileName
+                        os.system(rmBatFileCmd)
+                    if(self.testCfg.restartSvr == "True"):
+                        restartOS()
+                    else:
+                        time.sleep(45)
                 appendLog("-------------------------------------------------")
             else:
                 self.writeRunList()
@@ -186,6 +254,6 @@ class testClient(object):
                 appendLog( "all clips power test done!\nremoving startup service...")
                 appendLog("Power test finished...")
                 self.sock.close()
-                myDiagram.addDiagram("B")
-                myDiagram.genDiagram()
+                removeStartupService()
+                os.system("localCalculate.py")
                 break

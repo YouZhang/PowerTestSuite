@@ -12,7 +12,7 @@ import Diagram
 
 runList = os.path.join("RunList","list_ToRun.txt")
 doneList = os.path.join("RunList","list_done.txt")
-address = ('10.239.141.154', 31500)
+address = ('10.239.140.232', 31500)
 # address = ('127.0.0.1', 31500)
 testAppName = "mv_decoder_adv"
 parentConn,childConn = Pipe()
@@ -63,7 +63,7 @@ def postProcess(clip):
     command = 'move CPU_Usage.csv ' + cpuReport
     os.system(command)
 
-    gpuReport = clip + '\\' + clip + '_Report.csv'
+    gpuReport = clip + '\\' + clip + 'GPU_Report.csv'
     command = 'move Report.csv ' + gpuReport
     os.system(command)
     cpuUsage = "0"
@@ -81,12 +81,18 @@ def postProcess(clip):
             appendLog(gpuUsage)
 
     fpsReport = clip + '.txt'
-    logFp = file(fpsReport)
-    contents = logFp.read()
+
     try:
-        posStart = contents.rindex("(")
-        posEnd = contents.rindex("fps")
-        fps = contents[posStart+1:posEnd -1]
+        logFp = file(fpsReport)
+        contents = logFp.read()
+        endPos = contents.rindex("fps")
+        fps = contents[endPos-8:endPos-1]
+        endPos = contents.rindex("CPU usage")
+        cpuUsage = contents[32:40]
+        # posStart = contents.rindex("(")
+        # posEnd = contents.rindex("fps")
+        # fps = contents[posStart+1:posEnd -1]
+
         appendLog( "fps : %s" % fps)
     except:
         appendLog("App hang and fps could mot be found in the log..")
@@ -172,7 +178,7 @@ if __name__ == "__main__":
                 listToRunWriteHandle = open('RunList\List_ToRun.txt','w')
                 listToRunWriteHandle.write(context)
                 listToRunWriteHandle.close()                
-                time.sleep(30)
+                time.sleep(180)
                 appendLog("will sleep 70s....")
             appendLog("-------------------------------------------------")
 

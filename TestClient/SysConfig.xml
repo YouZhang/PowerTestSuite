@@ -4,30 +4,53 @@
         <AppPath>app</AppPath>
 		<ClipsPath>Clips</ClipsPath>
 		<LogPath>Log</LogPath>
-		<RegPath>reg</RegPath>
-		<RunListPath>RunList</RunListPath>
         <MVPLogPath>MVPLog</MVPLogPath>
+		<RunListPath>RunList</RunListPath>
         <batFilePath>bat</batFilePath>
         <localProcessPath>localProcess</localProcessPath>
 	</Path>
     <Misc>
 		<GPUReport>clipName_GPU.csv</GPUReport>
 		<CPUReport>clipName_CPU.csv</CPUReport>
-        <IP>10.239.141.144</IP>
+        <IP>10.239.141.232</IP>
         <Port>31500</Port>
 		<PowerConfig>Balanced</PowerConfig>
-        <AppHangService>C:\Users\sas-shs\Desktop\VP9\PowerTestSuite\TestClient\Lib_2.0\cpuMonitor.py</AppHangService>
+        <AppHangService>pwd\Lib_2.0\appHangMonitor.bat</AppHangService>
+        <MVP>True</MVP>
+        <RestartSvr>False</RestartSvr>
+        <SocWatch>False</SocWatch>
 	</Misc>
     <AppConfig>
-        <fixedPlayback>
+        <VP9FixedPlayback>
             <AppName>mv_decoder_adv</AppName>
-            <AppPath>app</AppPath>
+            <AppPath>app\mv_decoder_adv</AppPath>
             <AppBin>mv_decoder_adv_1011.exe</AppBin>
+            <RegFile>reg\vp9h.reg</RegFile>
             <Decoder>VP9</Decoder>
             <File>Input</File>
             <Display>cmd Fullscreen  overlay</Display>
             <Control>fps</Control>
-        </fixedPlayback>
+        </VP9FixedPlayback>
+        <VP9FreePlayback>
+            <AppName>mv_decoder_adv</AppName>
+            <AppPath>app\mv_decoder_adv</AppPath>
+            <AppBin>mv_decoder_adv_1011.exe</AppBin>
+            <RegFile>reg\vp9h.reg</RegFile>
+            <Decoder>VP9</Decoder>
+            <File>Input</File>
+            <Display>cmd Fullscreen</Display>
+            <Control>fps</Control>
+        </VP9FreePlayback>
+        <HEVCFixedPlayback>
+            <AppName>mfx_player</AppName>
+            <AppPath>app\mfx_player</AppPath>
+            <AppBin>mfx_player.exe</AppBin>
+            <RegFile>reg\hevch.reg</RegFile>
+            <Decoder>cmd</Decoder>
+            <File>Input  hevc</File>
+            <Display>Fullscreen</Display>
+            <Control>fps</Control>
+        </HEVCFixedPlayback>
     </AppConfig>
     <Apps>
         <mv_decoder_adv>
@@ -39,8 +62,9 @@
                 </Decoder>
                 <File>
                     <cmd></cmd>
-                    <Input cmd="-i">clipName</Input>
-                    <Output cmd="-o">dumpFile</Output>
+                    <Input cmd="-i">clipName.webm</Input>
+                    <Output cmd="-o">dumpFile.yuv</Output>
+                    <Bit10>-backbuffer D3DFMT_A2R10G10B10</Bit10>
                 </File>
                 <Display>
                     <cmd>--disp</cmd>
@@ -64,5 +88,43 @@
                 </Control>
             </Options>
         </mv_decoder_adv>
+        <mfx_player>
+            <Options>
+                <Decoder>
+                    <cmd>-d3d -hw_strict -dec:advance 24</cmd>
+                    <HEVC></HEVC>
+                    <VP9></VP9>
+                </Decoder>
+                <File>
+                    <cmd></cmd>
+                    <Input>
+                        <hevc cmd="-i:hevc">clipName.265</hevc>
+                        <vp9 cmd="-i:webm">clipName.webm</vp9>
+                    </Input>
+                    <Output cmd="-o:oFormat">dumpFile.yuv</Output>
+                    <Bit10>-backbuffer D3DFMT_A2R10G10B10</Bit10>
+                </File>
+                <Display>
+                    <cmd></cmd>
+                    <Fullscreen>-fullscreen -decode_plugin_guid 33a61c0b4c27454ca8d85dde757c6f8e -perf_opt</Fullscreen>
+                    <Method>
+                        <flip></flip>
+                        <flipex></flipex>
+                        <overlay></overlay>
+                    </Method>
+                </Display>
+                <Control>
+                    <cmd></cmd>
+                    <length cmd="-n">frameNum</length>
+                    <fps cmd="-fps targetFPS ">
+                        <F24>24</F24>
+                        <F30>30</F30>
+                        <F60>60</F60>
+                        <F120>120</F120>
+                        <free></free>
+                    </fps>
+                </Control>
+            </Options>
+        </mfx_player>
     </Apps>
 </Vp9_Power_Client_Config>

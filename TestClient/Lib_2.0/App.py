@@ -1,14 +1,14 @@
 #coding = utf-8
 import common
 import os
-from common import configFile
-from Config import myClientTestCfg
+from Config import testConfig
+
+myClientTestCfg = testConfig()
 
 class App(object):
 
     def __init__(self,appConfig):
         self.appConfig = appConfig
-        self.optionsItem = configFile.getSysConfigItem("Apps",appConfig.appName,"Options")
         self.param = ''
 
     def getParamByType(self,type,item):
@@ -26,22 +26,30 @@ class App(object):
                 common.appendLog("parse to the tree end...")
 
     def genCMDParam(self):
-        self.getParamByType("decoder",self.optionsItem.find("Decoder"))
-        self.getParamByType("control",self.optionsItem.find("Control"))
-        self.getParamByType("file",self.optionsItem.find("File"))
-        self.getParamByType("display",self.optionsItem.find("Display"))
+        self.getParamByType("decoder",self.appConfig.optionsItem.find("Decoder"))
+        self.getParamByType("control",self.appConfig.optionsItem.find("Control"))
+        self.getParamByType("file",self.appConfig.optionsItem.find("File"))
+        self.getParamByType("display",self.appConfig.optionsItem.find("Display"))
 
     def getFPSParam(self,targetFPS,mode):
-        fpsOpt = self.optionsItem.find("Control").find("fps")
+        fpsOpt = self.appConfig.optionsItem.find("Control").find("fps")
+        fpsParam = None
         for opt in list(fpsOpt):
-            if( mode == "free" and "free" in opt.tag):
-                return opt.text
             if( targetFPS in opt.tag ):
-                return opt.text
+                fpsParam = opt.text
+            if( "free" in mode and "free" in opt.tag):
+                fpsParam =  opt.text
+        return fpsParam
 
-    def genBatFile(self,clipName,targetFPS,mode):
+    def genTenBitParam(self,targetTenBit):
+        tenBitOpt = self.appConfig.optionsItem.find("File").find("Bit10")
+        if( targetTenBit in tenBitOpt.tag):
+            self.param += tenBitOpt.text
+
+    def genBatFile(self,clipName,targetFPS,tenBitOpt,mode):
+        self.genTenBitParam(tenBitOpt)
         cmd = self.appConfig.appBinary + self.param + " > log.txt"
-        clip = os.path.join(myClientTestCfg.clipsPath,clipName+".webm")
+        clip = os.path.join(myClientTestCfg.clipsPath,clipName)
         fpsOpt = self.getFPSParam(targetFPS,mode)
         cmd = cmd.replace("clipName",clip).replace("targetFPS",fpsOpt).replace("log",clipName)
         batFile = os.path.join(myClientTestCfg.batFilePath,clipName+".bat")
@@ -49,7 +57,6 @@ class App(object):
         handle.write(cmd)
         handle.close()
         return batFile
-
 
 if __name__ == "__main__":
     pass
