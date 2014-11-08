@@ -1,0 +1,1 @@
+app\mv_decoder_adv\mv_decoder_adv_1011.exe --vp9 --fps ntsc  -i Clips\ToS_1080p_30fps_VP9_9000frame_tilec4r4_10000kbps_m8.webm --disp --full  > ToS_1080p_30fps_VP9_9000frame_tilec4r4_10000kbps_m8.txt
