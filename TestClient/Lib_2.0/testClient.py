@@ -6,6 +6,8 @@ from common import syncRun,switchTo1080,switchTo4K,is4kMetric,appendLog,matchCas
 import csv
 from App import App
 import time
+import re
+import string
 
 pwd = os.getcwd()
 tempFolder = 'localProcess'
@@ -47,6 +49,10 @@ def postProcess(clip):
 	
     fpsReport = os.path.join(tempMVPFolder,clip+".txt")
     command = 'move %s.txt %s' %(clip,fpsReport)
+    os.system(command)
+
+    socWatchReport = os.path.join(tempMVPFolder,clip+".csv")
+    command = 'move %s.csv %s' %(clip,socWatchReport)
     os.system(command)
 
     gpuReport = os.path.join(tempMVPFolder,clip+"_GPU_Usage.csv")
@@ -100,6 +106,32 @@ def genSocWatchBat(clipName,clipLength):
     fileHandle.write(Cmd)
     fileHandle.close()
     return batFileName
+
+def calAveFreq(gpuFreqList):
+    temp = 0
+    for dataPair in gpuFreqList:
+        temp = temp + int(dataPair[0]) * string.atof(dataPair[1])
+    aveGpuFreq = temp / 100
+    return aveGpuFreq
+
+def getSocRes(socLogFile,*args):
+    result = []
+    fileHandle = open(socLogFile,'r')
+    content = fileHandle.read()
+    fileHandle.close()
+    for opt in args:
+        if( opt in "GPU"):
+            pos = content.index("GT P-State")
+            patten = re.compile("\n(\d+)MHz\s+,\s+(\d+\.\d+)%,.*")
+            gpuFreqList = patten.findall(content,pos)
+            aveGPUFreq = calAveFreq(gpuFreqList)
+            result.append(aveGPUFreq)
+        elif( opt in "CPU"):
+            pos = content.index("AvgFreq")
+            matchedCase = ".*AvgFreq,\s+,\s+(\d+)MHz.*"
+            aveCPUFreq = int(matchCase(content,matchedCase,pos))
+            result.append(aveCPUFreq)
+    return result
 
 class testClient(object):
 
