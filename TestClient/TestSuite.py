@@ -14,5 +14,5 @@ def init():
 if __name__ == "__main__":
     init()
     myClientTestCfg = testConfig()
-    myTestClient = testClient(myClientTestCfg,"VP9FreePlayback")
+    myTestClient = testClient(myClientTestCfg,"HEVCFixedPlayback")
     myTestClient.run()

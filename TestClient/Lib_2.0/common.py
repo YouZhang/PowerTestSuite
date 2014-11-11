@@ -233,7 +233,8 @@ def matchCase(content,patten,pos=0):
 
 def is4kMetric():
     width = GetSystemMetrics(0)
-    if(width > 2000):
+    appendLog("width: %s" % width)
+    if(width > 1500):
         return True
     else:
         return False

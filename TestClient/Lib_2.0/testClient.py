@@ -27,8 +27,9 @@ def removeStartupService():
     os.system(command)
 
 def restartOS():
-    command = 'shutdown -r'
+    command = 'shutdown -r -t 0'
     os.system(command)
+    time.sleep(10)
 
 def postProcess(clip):
     tempMVPFolder = os.path.join(tempFolder,clip)
@@ -46,43 +47,51 @@ def postProcess(clip):
     cpuReport = os.path.join(tempMVPFolder,clip+"_CPU_Usage.csv")
     command = 'move CPU_Usage.csv ' + cpuReport
     os.system(command)
-	
+
     fpsReport = os.path.join(tempMVPFolder,clip+".txt")
     command = 'move %s.txt %s' %(clip,fpsReport)
     os.system(command)
 
     socWatchReport = os.path.join(tempMVPFolder,clip+".csv")
-    command = 'move %s.csv %s' %(clip,socWatchReport)
+    command = 'move socRes\%s.csv %s' %(clip,socWatchReport)
     os.system(command)
-
+    
     gpuReport = os.path.join(tempMVPFolder,clip+"_GPU_Usage.csv")
     command = 'move Report.csv ' + gpuReport
     os.system(command)
     cpuUsage = getCPUUsage(cpuReport)
     gpuUsage = getGPUUsage(gpuReport)
     fps = getFpsInfo(fpsReport)
+    getSocRes(socWatchReport,"CPU","GPU","BW")    
     return fps,gpuUsage,cpuUsage
 
 def getCPUUsage(cpuReport):
     cpuUsage = "0"
-    reader = csv.reader(file(cpuReport, 'rb'))
-    for line in reader:
-        if cmp(line[0], "CPU Usage:") == 0:
-            cpuUsage = line[1].lstrip()
-            cpuUsage = cpuUsage.rstrip('%')
-            appendLog(cpuUsage)
+    try:
+        reader = csv.reader(file(cpuReport, 'rb'))
+        for line in reader:
+            if cmp(line[0], "CPU Usage:") == 0:
+                cpuUsage = line[1].lstrip()
+                cpuUsage = cpuUsage.rstrip('%')
+                appendLog(cpuUsage)
+    except:
+        appendLog("no cpu report file found!...")
     return cpuUsage
 
 def getGPUUsage(gpuReport):
     gpuUsage = "0"
-    reader = csv.reader(file(gpuReport, 'rb'))
-    for line in reader:
-        if cmp(line[1], "GPU Utilization(%)") == 0:
-            gpuUsage = line[2].rstrip()
-            appendLog(gpuUsage)
+    try:
+        reader = csv.reader(file(gpuReport, 'rb'))
+        for line in reader:
+            if cmp(line[1], "GPU Utilization(%)") == 0:
+                gpuUsage = line[2].rstrip()
+                appendLog(gpuUsage)
+    except:
+        appendLog("no gpu report found!")
     return gpuUsage
 
 def getFpsInfo(fpsReport):
+    fps = "0"
     try:
         contents = open(fpsReport,"r").read()
         pos = contents.rindex("fps") - 20
@@ -96,11 +105,10 @@ def getFpsInfo(fpsReport):
             appendLog( "fps : %s" % fps)
     except:
         appendLog("App hang and fps could mot be found in the log..")
-        fps = None
     return fps
 
 def genSocWatchBat(clipName,clipLength):
-    Cmd = '%s\\app\socwatch.lnk -t %s --max-detail -f ddr-bw  -f cpu-cstate -f cpu-pstate -f gfx-cstate -f gfx-pstate -f sys -o %s\socRes\%s' % (pwd,clipLength,pwd,clipName)
+    Cmd = '%s\\app\socwatch.lnk -t %s --max-detail -f ddr-bw  -f cpu-pstate  -f gfx-pstate -f sys -o %s\socRes\%s' % (pwd,clipLength,pwd,clipName)
     batFileName = '%s\socWatchBat\soc.bat' % pwd
     fileHandle = open(batFileName,'w')
     fileHandle.write(Cmd)
@@ -116,21 +124,36 @@ def calAveFreq(gpuFreqList):
 
 def getSocRes(socLogFile,*args):
     result = []
-    fileHandle = open(socLogFile,'r')
-    content = fileHandle.read()
-    fileHandle.close()
+    try:
+        fileHandle = open(socLogFile,'r')
+        content = fileHandle.read()
+        fileHandle.close()
+    except:
+        appendLog("no soc log file found!..")
+        return None
     for opt in args:
         if( opt in "GPU"):
+            aveGPUFreq = "0"
             pos = content.index("GT P-State")
             patten = re.compile("\n(\d+)MHz\s+,\s+(\d+\.\d+)%,.*")
             gpuFreqList = patten.findall(content,pos)
             aveGPUFreq = calAveFreq(gpuFreqList)
+            appendLog("aveGPUFreq : %s" % aveGPUFreq)
             result.append(aveGPUFreq)
         elif( opt in "CPU"):
+            aveCPUFreq = "0"
             pos = content.index("AvgFreq")
             matchedCase = ".*AvgFreq,\s+,\s+(\d+)MHz.*"
             aveCPUFreq = int(matchCase(content,matchedCase,pos))
+            appendLog("aveCPUFreq : %s" % aveCPUFreq)
             result.append(aveCPUFreq)
+        elif( opt in "BW"):
+            memBandwidth = "0"
+            pos = content.index("Total Memory Bandwidth")
+            matchedCase = ".*=, (\d+\.\d+),\n"
+            memBandwidth = string.atof(matchCase(content,matchedCase,pos))
+            appendLog("BW : %s" % memBandwidth)
+            result.append(memBandwidth)
     return result
 
 class testClient(object):
@@ -152,11 +175,14 @@ class testClient(object):
         doneListHandle.close()
 
     def removeDoneCase(self,clipsToRunList,clipNameToRun):
-        clipsToRunList.remove('1\t'+clipNameToRun+'\n')
-        context = ''.join(clipsToRunList)
-        listToRunWriteHandle = open(self.testCfg.todoList,'w')
-        listToRunWriteHandle.write(context)
-        listToRunWriteHandle.close()
+        appendLog("removing the clip : %s" % clipNameToRun )
+        for case in clipsToRunList:
+            if( clipNameToRun in case):
+                clipsToRunList.remove(case)
+                context = ''.join(clipsToRunList)
+                listToRunWriteHandle = open(self.testCfg.todoList,'w')
+                listToRunWriteHandle.write(context)
+                listToRunWriteHandle.close()
 
     def getRunCase(self):
         i = 0
@@ -219,17 +245,17 @@ class testClient(object):
                 else:
                     clipResolution,targetFPS,frameNum,tenBitOpt = parseClipInfo(clipNameToRun)
                     batFileName = self.testApp.genBatFile(clipNameToRun,targetFPS,tenBitOpt,self.appCfgOpt)
+                    appendLog("switch display monitor...")
                     switchDisplay(clipResolution)
                     clipLength = int(frameNum) / int (targetFPS)
                     appendLog("clip length : %s" % clipLength)
-                    time.sleep(45)
+                    time.sleep(25)
                     if( self.testCfg.MVP == "True"):
                         MVPCmd = "MVP_Agent.exe -t %s" % batFileName
                         self.sock.sendto(clipNameToRun,self.testCfg.address)
                         os.system(MVPCmd)
                         self.sock.sendto(clipNameToRun,self.testCfg.address)
-                        appendLog("%s  power test end..." % clipNameToRun)
-                        fps,gpuUsage,cpuUsage = postProcess(clipNameToRun)
+                        appendLog("%s  power test end..." % clipNameToRun)                    
                     else:
                         if(self.testCfg.socWatch == "True"):                            
                             appendLog("starting the SocWatch...")					
@@ -238,13 +264,16 @@ class testClient(object):
                             time.sleep(5)
                         os.system(batFileName)
                         fps = getFpsInfo(clipNameToRun+".txt")
-                    if( fps != None):
+                        time.sleep(135)
+                    fps,gpuUsage,cpuUsage = postProcess(clipNameToRun)
+                    if( fps != '0' or "Chrome" in self.appCfgOpt):
                         self.removeDoneCase(caseToRunList,clipNameToRun)
                     else:
                         rmBatFileCmd = 'del bat\%s.bat' % batFileName
                         os.system(rmBatFileCmd)
                     if(self.testCfg.restartSvr == "True"):
-                        restartOS()
+                        time.sleep(5)
+                        restartOS()                        
                     else:
                         time.sleep(45)
                 appendLog("-------------------------------------------------")

@@ -26,10 +26,11 @@ class App(object):
                 common.appendLog("parse to the tree end...")
 
     def genCMDParam(self):
+        self.getParamByType("display",self.appConfig.optionsItem.find("Display"))
         self.getParamByType("decoder",self.appConfig.optionsItem.find("Decoder"))
         self.getParamByType("control",self.appConfig.optionsItem.find("Control"))
         self.getParamByType("file",self.appConfig.optionsItem.find("File"))
-        self.getParamByType("display",self.appConfig.optionsItem.find("Display"))
+
 
     def getFPSParam(self,targetFPS,mode):
         fpsOpt = self.appConfig.optionsItem.find("Control").find("fps")
@@ -37,7 +38,7 @@ class App(object):
         for opt in list(fpsOpt):
             if( targetFPS in opt.tag ):
                 fpsParam = opt.text
-            if( "free" in mode and "free" in opt.tag):
+            if( "Free" in mode and "free" in opt.tag):
                 fpsParam =  opt.text
         return fpsParam
 
@@ -51,7 +52,9 @@ class App(object):
         cmd = self.appConfig.appBinary + self.param + " > log.txt"
         clip = os.path.join(myClientTestCfg.clipsPath,clipName)
         fpsOpt = self.getFPSParam(targetFPS,mode)
-        cmd = cmd.replace("clipName",clip).replace("targetFPS",fpsOpt).replace("log",clipName)
+        if( fpsOpt != None):
+            cmd = cmd.replace("targetFPS",fpsOpt)
+        cmd = cmd.replace("clipName",clip).replace("log",clipName).replace("pwd",os.getcwd())
         batFile = os.path.join(myClientTestCfg.batFilePath,clipName+".bat")
         handle = file(batFile,'w')
         handle.write(cmd)

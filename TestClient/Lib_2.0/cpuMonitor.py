@@ -25,6 +25,7 @@ class CPUMonitor(object):
             killChrome = "taskkill -f -im chrome.exe"
             killMv = "taskkill -f -im mv_decoder_adv*"
             killMfx = "taskkill -f -im mfx_player*"
+            killSoc = "taskkill -f -im socwatch.exe"
             appendLog("kill mv_decoder_adv..")
             os.system(killMv)
             appendLog("kill mfx_player..")
@@ -33,6 +34,8 @@ class CPUMonitor(object):
             os.system(killFirefox)
             appendLog("kill chrome...")
             os.system(killChrome)
+            appendLog("kill socWatch...")
+            os.system(killSoc)
             
 
 def killHangAppService():

@@ -1,1 +1,1 @@
-python C:\Users\You\Documents\GitHub\PowerTestSuite\TestClient\Lib_2.0\cpuMonitor.py
+python C:\Users\sas-shs\Desktop\VP9\PowerTestSuite\TestClient\Lib_2.0\cpuMonitor.py

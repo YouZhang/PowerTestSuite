@@ -4,6 +4,7 @@
         <AppPath>app</AppPath>
 		<ClipsPath>Clips</ClipsPath>
 		<LogPath>Log</LogPath>
+        <MVPLogPath>MVPLog</MVPLogPath>
 		<RunListPath>RunList</RunListPath>
         <batFilePath>bat</batFilePath>
         <localProcessPath>localProcess</localProcessPath>
@@ -11,12 +12,12 @@
     <Misc>
 		<GPUReport>clipName_GPU.csv</GPUReport>
 		<CPUReport>clipName_CPU.csv</CPUReport>
-        <IP>10.239.141.232</IP>
+        <IP>10.239.141.140</IP>
         <Port>31500</Port>
 		<PowerConfig>Balanced</PowerConfig>
         <AppHangService>pwd\Lib_2.0\appHangMonitor.bat</AppHangService>
         <MVP>True</MVP>
-        <RestartSvr>False</RestartSvr>
+        <RestartSvr>True</RestartSvr>
         <SocWatch>False</SocWatch>
 	</Misc>
     <AppConfig>
@@ -50,6 +51,16 @@
             <Display>Fullscreen</Display>
             <Control>fps</Control>
         </HEVCFixedPlayback>
+        <VP9FixedChrome>
+            <AppName>chrome</AppName>
+            <AppPath>app\chrome</AppPath>
+            <AppBin>chrome.lnk</AppBin>
+            <Decoder>VP9</Decoder>
+            <RegFile>reg\vp9h.reg</RegFile>
+            <Display>Fullscreen</Display>
+            <File>Input  vp9</File>
+            <Control>fps</Control>
+        </VP9FixedChrome>
     </AppConfig>
     <Apps>
         <mv_decoder_adv>
@@ -61,7 +72,7 @@
                 </Decoder>
                 <File>
                     <cmd></cmd>
-                    <Input cmd="-i">clipName.webm</Input>
+                    <Input cmd="-i">pwd\clipName.webm</Input>
                     <Output cmd="-o">dumpFile.yuv</Output>
                     <Bit10>-backbuffer D3DFMT_A2R10G10B10</Bit10>
                 </File>
@@ -97,8 +108,8 @@
                 <File>
                     <cmd></cmd>
                     <Input>
-                        <hevc cmd="-i:hevc">clipName.265</hevc>
-                        <vp9 cmd="-i:webm">clipName.webm</vp9>
+                        <hevc cmd="-i:hevc">pwd\clipName.265</hevc>
+                        <vp9 cmd="-i:webm">pwd\clipName.webm</vp9>
                     </Input>
                     <Output cmd="-o:oFormat">dumpFile.yuv</Output>
                     <Bit10>-backbuffer D3DFMT_A2R10G10B10</Bit10>
@@ -125,5 +136,43 @@
                 </Control>
             </Options>
         </mfx_player>
+        <chrome>
+            <Options>
+                <Decoder>
+                    <cmd></cmd>
+                    <HEVC></HEVC>
+                    <VP9></VP9>
+                </Decoder>
+                <File>
+                    <cmd></cmd>
+                    <Input>
+                        <hevc cmd="">pwd\clipName.265</hevc>
+                        <vp9 cmd="">pwd\clipName.webm</vp9>
+                    </Input>
+                    <Output cmd=""></Output>
+                    <Bit10></Bit10>
+                </File>
+                <Display>
+                    <cmd></cmd>
+                    <Fullscreen>--kiosk</Fullscreen>
+                    <Method>
+                        <flip></flip>
+                        <flipex></flipex>
+                        <overlay></overlay>
+                    </Method>
+                </Display>
+                <Control>
+                    <cmd></cmd>
+                    <length cmd=""></length>
+                    <fps cmd="">
+                        <F24></F24>
+                        <F30></F30>
+                        <F60></F60>
+                        <F120></F120>
+                        <free></free>
+                    </fps>
+                </Control>
+            </Options>
+        </chrome>
     </Apps>
 </Vp9_Power_Client_Config>
