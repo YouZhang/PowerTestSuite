@@ -8,6 +8,7 @@ from App import App
 import time
 import re
 import string
+import timeit
 
 pwd = os.getcwd()
 tempFolder = 'localProcess'
@@ -253,7 +254,7 @@ class testClient(object):
                     if( self.testCfg.MVP == "True"):
                         MVPCmd = "MVP_Agent.exe -t %s" % batFileName
                         self.sock.sendto(clipNameToRun,self.testCfg.address)
-                        os.system(MVPCmd)
+                        totalTime = timeit.Timer(os.system(MVPCmd))
                         self.sock.sendto(clipNameToRun,self.testCfg.address)
                         appendLog("%s  power test end..." % clipNameToRun)                    
                     else:
@@ -262,11 +263,13 @@ class testClient(object):
                             socWatchBat = genSocWatchBat(clipNameToRun,clipLength)
                             syncRun(socWatchBat)
                             time.sleep(5)
-                        os.system(batFileName)
+                        totalTime = timeit.Timer(os.system(batFileName))
                         fps = getFpsInfo(clipNameToRun+".txt")
                         time.sleep(135)
                     fps,gpuUsage,cpuUsage = postProcess(clipNameToRun)
                     if( fps != '0' or "Chrome" in self.appCfgOpt):
+                        fps = int(frameNum) / totalTime
+                        appendLog("fps : %s" % fps)
                         self.removeDoneCase(caseToRunList,clipNameToRun)
                     else:
                         rmBatFileCmd = 'del bat\%s.bat' % batFileName
