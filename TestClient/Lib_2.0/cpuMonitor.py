@@ -18,7 +18,8 @@ class CPUMonitor(object):
         pass
         
     def taskMonitor(self):
-        cpuUtilization = psutil.cpu_percent(4)
+        cpuUtilization = psutil.cpu_percent(2.3)
+        print cpuUtilization
         if( cpuUtilization < 5 ):
             appendLog("current CPU Utilization: %s" % cpuUtilization)
             killFirefox = "taskkill -f -im firefox.exe"
@@ -26,6 +27,11 @@ class CPUMonitor(object):
             killMv = "taskkill -f -im mv_decoder_adv*"
             killMfx = "taskkill -f -im mfx_player*"
             killSoc = "taskkill -f -im socwatch.exe"
+            killEmon = "taskkill -f -im Emon*"
+            appendLog("kill socWatch...")
+            os.system(killSoc)
+            appendLog("kill Emon...")
+            os.system(killEmon)  
             appendLog("kill mv_decoder_adv..")
             os.system(killMv)
             appendLog("kill mfx_player..")
@@ -34,8 +40,7 @@ class CPUMonitor(object):
             os.system(killFirefox)
             appendLog("kill chrome...")
             os.system(killChrome)
-            appendLog("kill socWatch...")
-            os.system(killSoc)
+        
             
 
 def killHangAppService():
@@ -50,4 +55,4 @@ if __name__ == "__main__":
     time.sleep(10)
     while(1):
         cpuMonitor.taskMonitor()
-        time.sleep(5)
+        time.sleep(1.8)
