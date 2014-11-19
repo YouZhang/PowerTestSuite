@@ -1,2 +1,3 @@
-cd C:\Users\sas-shs\Desktop\VP9\PowerTestSuite\TestClient
-python TestSuite.py
+cd %~dp0
+python %~dp0\TestSuite.py
+pause

@@ -1,1 +1,1 @@
-python C:\Users\sas-shs\Desktop\VP9\PowerTestSuite\TestClient\Lib_2.0\cpuMonitor.py
+python %~dp0\cpuMonitor.py
