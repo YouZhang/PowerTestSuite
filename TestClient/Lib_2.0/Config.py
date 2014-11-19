@@ -14,6 +14,7 @@ class appConfig(object):
         self.appName = configFile.getConfigContent("AppConfig",mode,"AppName")
         self.regFile = configFile.getConfigContent("AppConfig",mode,"RegFile")
         self.optionsItem = configFile.getSysConfigItem("Apps",self.appName,"Options")
+        self.driver = configFile.getConfigContent("AppConfig",mode,"Driver")
         self.appBinary = os.path.join(appPath,appBin) + " "
         self.param = {}
         self.param["decoder"] = configFile.getConfigContent("AppConfig",mode,"Decoder")
@@ -24,27 +25,30 @@ class appConfig(object):
 class testConfig(object):
 
     def __init__(self):
-        MVPLogBasePath = configFile.getConfigContent("Path","MVPLogPath")
+        self.getFilePathCfg()
+        self.getMiscCfg()
+
+    def getFilePathCfg(self):        
         logPath = configFile.getConfigContent("Path","LogPath")
         runListPath = configFile.getConfigContent("Path","RunListPath")
+        self.appPath = configFile.getConfigContent("Path","AppPath")
+        self.clipsPath = configFile.getConfigContent("Path","ClipsPath")
+        self.batFilePath = configFile.getConfigContent("Path","batFilePath")
+        self.localProcessFolder = configFile.getConfigContent("Path","localProcessPath")
+        self.todoList = os.path.join(runListPath,"List_ToRun.txt")
+        self.doneList = os.path.join(runListPath,"List_Done.txt")
+        self.logFile = os.path.join(logPath,common.localTime+".txt")        
+
+    def getMiscCfg(self):
         ip = configFile.getConfigContent("Misc","IP")
         port = int(configFile.getConfigContent("Misc","Port"))
         self.address = (ip,port)
-        self.appPath = configFile.getConfigContent("Path","AppPath")
-        self.clipsPath = configFile.getConfigContent("Path","ClipsPath")
-        self.logFile = os.path.join(logPath,common.localTime+".txt")
-        self.todoList = os.path.join(runListPath,"List_ToRun.txt")
-        self.doneList = os.path.join(runListPath,"List_Done.txt")
-        self.MVPLogPath = os.path.join(MVPLogBasePath,common.localTime)
-        self.batFilePath = configFile.getConfigContent("Path","batFilePath")
-        self.localProcessFolder = configFile.getConfigContent("Path","localProcessPath")
         self.powerConfig = configFile.getConfigContent("Misc","PowerConfig")
         self.hangService = configFile.getConfigContent("Misc","AppHangService")
         self.MVP = configFile.getConfigContent("Misc","MVP")
         self.restartSvr = configFile.getConfigContent("Misc","RestartSvr")
         self.socWatch = configFile.getConfigContent("Misc","SocWatch")
-
-
+        self.emon = configFile.getConfigContent("Misc","Emon")
 
 if __name__ == "__main__":
     configFile.getSysConfigItem("Apps","mv_decoder_adv")

@@ -3,15 +3,12 @@
 	<Path>
         <AppPath>app</AppPath>
 		<ClipsPath>Clips</ClipsPath>
-		<LogPath>Log</LogPath>
-        <MVPLogPath>MVPLog</MVPLogPath>
+		<LogPath>Log</LogPath>        
 		<RunListPath>RunList</RunListPath>
         <batFilePath>bat</batFilePath>
         <localProcessPath>localProcess</localProcessPath>
 	</Path>
     <Misc>
-		<GPUReport>clipName_GPU.csv</GPUReport>
-		<CPUReport>clipName_CPU.csv</CPUReport>
         <IP>10.239.141.140</IP>
         <Port>31500</Port>
 		<PowerConfig>Balanced</PowerConfig>
@@ -19,6 +16,7 @@
         <MVP>True</MVP>
         <RestartSvr>True</RestartSvr>
         <SocWatch>False</SocWatch>
+        <Emon>False</Emon>
 	</Misc>
     <AppConfig>
         <VP9FixedPlayback>
@@ -26,26 +24,29 @@
             <AppPath>app\mv_decoder_adv</AppPath>
             <AppBin>mv_decoder_adv_1011.exe</AppBin>
             <RegFile>reg\vp9h.reg</RegFile>
+            <Driver>manual-main-91254 Release 64-bit</Driver>
             <Decoder>VP9</Decoder>
             <File>Input</File>
             <Display>cmd Fullscreen  overlay</Display>
             <Control>fps</Control>
         </VP9FixedPlayback>
-        <VP9FreePlayback>
+        <VP9MvFreePlayback>
             <AppName>mv_decoder_adv</AppName>
             <AppPath>app\mv_decoder_adv</AppPath>
             <AppBin>mv_decoder_adv_1011.exe</AppBin>
             <RegFile>reg\vp9h.reg</RegFile>
+            <Driver>manual-gen8_2014-10604 Release 64-bit</Driver>
             <Decoder>VP9</Decoder>
             <File>Input</File>
             <Display>cmd Fullscreen</Display>
             <Control>fps</Control>
-        </VP9FreePlayback>
+        </VP9MvFreePlayback>
         <HEVCFixedPlayback>
             <AppName>mfx_player</AppName>
             <AppPath>app\mfx_player</AppPath>
             <AppBin>mfx_player.exe</AppBin>
             <RegFile>reg\hevch.reg</RegFile>
+            <Driver>ci-main-28601 Release 64-bit</Driver>
             <Decoder>cmd</Decoder>
             <File>Input  hevc</File>
             <Display>Fullscreen</Display>
@@ -55,8 +56,9 @@
             <AppName>chrome</AppName>
             <AppPath>app\chrome</AppPath>
             <AppBin>chrome.lnk</AppBin>
-            <Decoder>VP9</Decoder>
             <RegFile>reg\vp9h.reg</RegFile>
+            <Decoder>VP9</Decoder>
+            <Driver>manual-main-91254 Release-Internal 64-bit</Driver>
             <Display>Fullscreen</Display>
             <File>Input  vp9</File>
             <Control>fps</Control>
