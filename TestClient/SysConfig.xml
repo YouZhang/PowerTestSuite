@@ -92,6 +92,7 @@
                     <length cmd="--limit">frameNum</length>
                     <fps cmd="--fps targetFPS ">
                         <F24>film</F24>
+                        <F25>pal</F25>
                         <F30>ntsc</F30>
                         <F60>ntsc60</F60>
                         <F120>ntsc120</F120>
@@ -130,6 +131,7 @@
                     <length cmd="-n">frameNum</length>
                     <fps cmd="-fps targetFPS ">
                         <F24>24</F24>
+                        <F25>25</F25>
                         <F30>30</F30>
                         <F60>60</F60>
                         <F120>120</F120>
