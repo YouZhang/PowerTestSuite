@@ -2,7 +2,7 @@
 import socket
 from Config import appConfig
 import os
-from common import syncAdminRun,switchTo1080,switchTo4K,is4kMetric,appendLog,matchCase,parseClipInfo,syncRun
+from common import syncAdminRun,appendLog,matchCase,parseClipInfo,syncRun
 import csv
 from App import App
 import time
@@ -12,12 +12,6 @@ from emon import EmonProcessor
 
 pwd = os.getcwd()
 tempFolder = 'localProcess'
-
-def switchDisplay(clipResolution):
-    if(clipResolution == "2160" and not is4kMetric()):
-        switchTo4K()
-    if(clipResolution == "1080" and is4kMetric() ):
-        switchTo1080()
 
 def addStartupService():
     command = 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /v Client /t reg_sz /d "%s\\run.bat" /f' % pwd
@@ -286,7 +280,8 @@ class testClient(object):
                     batFileName = self.testApp.genBatFile(clipNameToRun,targetFPS,tenBitOpt,self.appCfgOpt)
                     time.sleep(20)
                     appendLog("switch display monitor...")
-                    switchDisplay(clipResolution)
+                    switchCmd = "tool\switchDisplay.exe " +  clipResolution
+                    syncRun(switchCmd)
                     clipLength = int(frameNum) / int (targetFPS)
                     appendLog("clip length : %s" % clipLength)
                     time.sleep(15)
