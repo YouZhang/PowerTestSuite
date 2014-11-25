@@ -8,8 +8,11 @@ from Diagram import diagram
 from common import *
 from emon import EmonProcessor
 
+mode = sys.argv[1]
 initRow = ("Cases","CPU","GPU","FPS","AveCPUFreq","AveGPUFreq","MemBandwidth","pkgPower")
-resultFile = localTime + ".xlsx"
+resultFolder = getDir("Results",mode)
+mkdir(resultFolder)
+resultFile = getDir("Results",mode,localTime + ".xlsx")
 myDiagram = diagram(resultFile,initRow,10)
 tempFolder = 'localProcess'
 myClientTestCfg = testConfig()
@@ -17,7 +20,7 @@ myClientTestCfg = testConfig()
 
 def getResult():
     emonRes = ['0','0','0']
-    rootPath = myClientTestCfg.localProcessFolder
+    rootPath = myClientTestCfg.localProcessPath
     for parent,dirNamesList,fileNameList in os.walk(rootPath):
         for dirName in dirNamesList:
             clipResolution,targetFPS,frameNum,tenBitOpt = parseClipInfo(dirName)

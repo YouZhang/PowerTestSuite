@@ -4,64 +4,58 @@ import re
 import win32api
 import win32con
 import time
-from win32api import GetSystemMetrics
-from xml.etree import ElementTree as ET
 from KeyValue import VK_CODE
 
-class sysConfigFile(object):
-
-    def __init__(self,xmlFile = 'sysConfig.xml'):
-        self.rootNode = ET.parse(xmlFile).getroot()
-
-    def getSysConfigItem(self,*args):
-        item = self.rootNode.find(args[0])
-        for i in range(1,len(args)):
-            item = item.find(args[i])
-        return item
-
-    def getConfigContent(self,*args):
-        item = self.getSysConfigItem(*args)
-        return item.text
-
-    def getConfigTag(self,*args):
-        item = self.getSysConfigItem(*args)
-        return item.tag
-
 localTime = time.strftime("%Y-%m-%d_%H-%M-%S",time.localtime())
+pwd = os.getcwd()
 
-def switchTo4K():
-    win32api.keybd_event(VK_CODE['win'],0,0,0)
-    win32api.keybd_event(VK_CODE['p'],0,0,0)
-    win32api.keybd_event(VK_CODE['win'],0,win32con.KEYEVENTF_KEYUP,0)
-    win32api.keybd_event(VK_CODE['p'],0,win32con.KEYEVENTF_KEYUP,0)
-    time.sleep(1)
-    win32api.keybd_event(VK_CODE['up_arrow'],0,0,0)
-    win32api.keybd_event(VK_CODE['up_arrow'],0,win32con.KEYEVENTF_KEYUP,0)
-    time.sleep(1)
-    win32api.keybd_event(VK_CODE['enter'],0,0,0)
-    win32api.keybd_event(VK_CODE['enter'],0,win32con.KEYEVENTF_KEYUP,0)
-    time.sleep(12)
+def cmdRun(cmd):
+    appendLog("running command : %s" % cmd)
+    os.system(cmd)
 
-def switchTo1080():
-    win32api.keybd_event(VK_CODE['win'],0,0,0)
-    win32api.keybd_event(VK_CODE['p'],0,0,0)
-    win32api.keybd_event(VK_CODE['win'],0,win32con.KEYEVENTF_KEYUP,0)
-    win32api.keybd_event(VK_CODE['p'],0,win32con.KEYEVENTF_KEYUP,0)
-    time.sleep(1)
-    win32api.keybd_event(VK_CODE['down_arrow'],0,0,0)
-    win32api.keybd_event(VK_CODE['down_arrow'],0,win32con.KEYEVENTF_KEYUP,0)
-    time.sleep(1)
-    win32api.keybd_event(VK_CODE['enter'],0,0,0)
-    win32api.keybd_event(VK_CODE['enter'],0,win32con.KEYEVENTF_KEYUP,0)
+def mkdir(path):
+    appendLog("make directory %s" % path)
+    try:
+        cmd = "mkdir %s" % path
+        cmdRun(cmd)
+    except WindowsError:
+        appendLog("%s already exited..." % path)
 
+def getDir(*path):
+    return os.path.join(*path)
 
-def appendLog(message):
+def removeFiles(patten,path=None):
+    assert (patten != None)
+    if( path != None ):
+        targetFiles = getDir(path,patten)
+    else:
+        targetFiles = patten
+    appendLog("removing files : %s" % patten)
+    cmdRun("del %s" % targetFiles)
+
+def copy(src,target):
+    appendLog("copy /y files from : %s to %s" % (src,target))
+    cmdRun("copy %s %s" % (src,target))
+
+def move(src,target):
+    appendLog("move files from %s to %s" % (src,target))
+    cmdRun("move %s %s" % (src,target))
+
+def appendLog(message,folder="Log"):
     print message
-    logfile = os.path.join("Log",localTime+".log")
+    logfile = getDir(folder,localTime+".log")
     logHandle = open(logfile,"a")
-    logHandle.write(message + "\n\n")
+    logHandle.write(str(message) + "\n\n")
     logHandle.close()
 
+def backupData(src,mode):
+    """
+
+    :rtype : object
+    """
+    backFolder = getDir("backup",mode,localTime)
+    mkdir(backFolder)
+    move(src,target=backFolder)
 
 def parseClipInfo(clip):
     resMatchedCase = ".*_(\d+)p.*"
@@ -83,14 +77,6 @@ def matchCase(content,patten,pos=0):
     matchedItem = patten.match(content,pos)
     return matchedItem.group(1)
 
-def is4kMetric():
-    width = GetSystemMetrics(0)
-    appendLog("width: %s" % width)
-    if(width > 1500):
-        return True
-    else:
-        return False
-
 def keyPress(targetStr):
     for i in range(len(targetStr)):
         target = targetStr[i].lower()
@@ -110,11 +96,67 @@ def keyPress(targetStr):
 
 def syncRun(fileName):
     cmd = 'start ' + fileName
-    os.system(cmd)
+    cmdRun(cmd)
 
 def syncAdminRun(fileName):
     cmd = 'runas /savecred /user:administrator ' + fileName
-    os.system(cmd)
+    cmdRun(cmd)
+
+def getIp(machineName):
+    resultFile = "pingRes.txt"
+    cmdRun("ping %s > %s" % (machineName,resultFile))
+    handle = open(resultFile,'r')
+    line = handle.readline()
+    if(line == '\n'):
+        line = handle.readline()
+        try:
+            startPos = line.index('[')
+            endPos = line.index(']')
+            ip = line[startPos+1:endPos]
+            appendLog("server ip : %s" % ip)
+            if(len(ip) < 10):
+                appendLog("cannot find your ip")
+                return -1
+            return ip
+        except:
+            appendLog("could not find the server ip, pls check the network config")
+            return -1
+
+
+def getRunCase(runList):
+        i = 0
+        runCase = None
+        listToRunReadHandle = open(runList,'r')
+        caseToRunList = listToRunReadHandle.readlines()
+        listToRunReadHandle.close()
+        while(i < len(caseToRunList)):
+            try:
+                state,case = caseToRunList[i].split()
+                if( state == "1"):
+                    runCase = case
+                    break
+                i += 1
+            except:
+                appendLog("empty list ...")
+                return None,None
+        return caseToRunList,runCase
+
+def removeDoneCase(testModeList,caseToRunList,toRemoveCase):
+    appendLog("removing the case : %s" % toRemoveCase )
+    for i in range(len(caseToRunList)):
+        case = caseToRunList[i]
+        if( toRemoveCase in case):
+            case = "0" + case[1:len(case)]
+            caseToRunList[i] = case
+            context = ''.join(caseToRunList)
+            listToRunWriteHandle = open(testModeList,'w')
+            listToRunWriteHandle.write(context)
+            listToRunWriteHandle.close()
+            return
 
 if __name__ == "__main__":
-    syncRun('C:\Users\sas-shs\Desktop\VP9\PowerTestSuite\TestClient\socWatchBat\soc.bat')
+    getDir("C:\Users\You\Documents\GitHub\PowerTestSuite\TestClient","a","b")
+    backupData("localProcess","Vp")
+    # removeFiles("*.xlsx","..")
+    # copy("..\mvp","..")
+    # move("..\mvp","..")

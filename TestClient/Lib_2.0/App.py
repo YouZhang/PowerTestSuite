@@ -1,14 +1,12 @@
 #coding = utf-8
-import common
-import os
-from Config import testConfig
+from common import getDir,appendLog,pwd
 
-myClientTestCfg = testConfig()
 
 class App(object):
 
-    def __init__(self,appConfig):
+    def __init__(self,appConfig,testCfg):
         self.appConfig = appConfig
+        self.testCfg = testCfg
         self.param = ''
 
     def getParamByType(self,type,item):
@@ -23,7 +21,7 @@ class App(object):
                             self.param += option.text + " "
                         self.getParamByType(type,option)
             except:
-                common.appendLog("parse to the tree end...")
+                appendLog("parse to the tree end...")
 
     def genCMDParam(self):
         self.getParamByType("display",self.appConfig.optionsItem.find("Display"))
@@ -50,12 +48,12 @@ class App(object):
     def genBatFile(self,clipName,targetFPS,tenBitOpt,mode):
         self.genTenBitParam(tenBitOpt)
         cmd = self.appConfig.appBinary + self.param + " > log.txt"
-        clip = os.path.join(myClientTestCfg.clipsPath,clipName)
+        clip = getDir(self.testCfg.clipsPath,clipName)
         fpsOpt = self.getFPSParam(targetFPS,mode)
         if( fpsOpt != None):
             cmd = cmd.replace("targetFPS",fpsOpt)
-        cmd = cmd.replace("clipName",clip).replace("log",clipName).replace("pwd",os.getcwd())
-        batFile = os.path.join(myClientTestCfg.batFilePath,clipName+".bat")
+        cmd = cmd.replace("clipName",clip).replace("log",clipName).replace("pwd",pwd)
+        batFile = getDir(self.testCfg.batFilePath,clipName+".bat")
         handle = file(batFile,'w')
         handle.write(cmd)
         handle.close()

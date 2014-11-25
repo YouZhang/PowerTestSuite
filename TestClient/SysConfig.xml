@@ -7,24 +7,32 @@
 		<RunListPath>RunList</RunListPath>
         <batFilePath>bat</batFilePath>
         <localProcessPath>localProcess</localProcessPath>
+        <DriverPath>drv</DriverPath>
+        <SocResPath>socRes</SocResPath>
+        <BackupPath>backup</BackupPath>
 	</Path>
     <Misc>
-        <IP>10.239.141.140</IP>
-        <Port>31500</Port>
+        <ServerMachine>pba-ni-pc</ServerMachine>
+        <Port>31502</Port>
 		<PowerConfig>Balanced</PowerConfig>
+        <TempFolder>localProcess</TempFolder>
         <AppHangService>pwd\Lib_2.0\appHangMonitor.bat</AppHangService>
         <MVP>True</MVP>
+        <powerMeasure>True</powerMeasure>
         <RestartSvr>True</RestartSvr>
         <SocWatch>False</SocWatch>
         <Emon>False</Emon>
 	</Misc>
-    <AppConfig>
+    <TestMode>
         <VP9FixedPlayback>
             <AppName>mv_decoder_adv</AppName>
             <AppPath>app\mv_decoder_adv</AppPath>
             <AppBin>mv_decoder_adv_1011.exe</AppBin>
             <RegFile>reg\vp9h.reg</RegFile>
-            <Driver>manual-main-91254 Release 64-bit</Driver>
+            <ServerMachine>pba-ni-pc</ServerMachine>
+            <Port>31500</Port>
+            <RunList>RunList\VP9FixedPlayback</RunList>
+            <Driver>manual-gen8_2014-10631 Release 64-bit</Driver>
             <Decoder>VP9</Decoder>
             <File>Input</File>
             <Display>cmd Fullscreen  overlay</Display>
@@ -35,6 +43,9 @@
             <AppPath>app\mv_decoder_adv</AppPath>
             <AppBin>mv_decoder_adv_1011.exe</AppBin>
             <RegFile>reg\vp9h.reg</RegFile>
+            <ServerMachine>pba-ni-pc</ServerMachine>
+            <Port>31501</Port>
+            <RunList>RunList\VP9MvFreePlayback</RunList>
             <Driver>manual-gen8_2014-10604 Release 64-bit</Driver>
             <Decoder>VP9</Decoder>
             <File>Input</File>
@@ -46,6 +57,9 @@
             <AppPath>app\mfx_player</AppPath>
             <AppBin>mfx_player.exe</AppBin>
             <RegFile>reg\hevch.reg</RegFile>
+            <ServerMachine>pba-ni-pc</ServerMachine>
+            <Port>31502</Port>
+            <RunList>RunList\HEVCFixedPlayback</RunList>
             <Driver>ci-main-28601 Release 64-bit</Driver>
             <Decoder>cmd</Decoder>
             <File>Input  hevc</File>
@@ -57,13 +71,16 @@
             <AppPath>app\chrome</AppPath>
             <AppBin>chrome.lnk</AppBin>
             <RegFile>reg\vp9h.reg</RegFile>
-            <Decoder>VP9</Decoder>
+            <ServerMachine>pba-ni-pc</ServerMachine>
+            <Port>31503</Port>
+            <RunList>RunList\VP9FixedChrome</RunList>
             <Driver>manual-main-91254 Release-Internal 64-bit</Driver>
+            <Decoder>VP9</Decoder>
             <Display>Fullscreen</Display>
             <File>Input  vp9</File>
             <Control>fps</Control>
         </VP9FixedChrome>
-    </AppConfig>
+    </TestMode>
     <Apps>
         <mv_decoder_adv>
             <Options>
