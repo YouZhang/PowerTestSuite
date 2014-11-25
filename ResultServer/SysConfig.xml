@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Vp9_Power_Test_Config version="1.0.0">
-	<Misc>
-        <Address>192.168.0.110</Address>
-        <Port>31500</Port>
-		<LogPath>Log</LogPath>
-        <resultFolder>Results</resultFolder>
+	<CommonCfg>
+        <ServerMachine>pba-ni-pc</ServerMachine>
         <rawDataFolder>RawData</rawDataFolder>
         <startButtonPos>65  55</startButtonPos>
         <stopButtonPos>110  55</stopButtonPos>
@@ -13,5 +10,27 @@
         <chartStyle>10</chartStyle>
         <localDataPath>localProcessData</localDataPath>
         <targetDataPos>F</targetDataPos>
-	</Misc>
+	</CommonCfg>
+    <SpecificCfg>
+        <VP9FixedPlayback>
+            <Port>31500</Port>
+            <LogPath>Log\VP9FixedPlayback</LogPath>
+            <resultFolder>Results\VP9FixedPlayback</resultFolder>
+        </VP9FixedPlayback>
+        <VP9MvFreePlayback>
+            <Port>31501</Port>
+            <LogPath>Log\vp9MvFreePlayback</LogPath>
+            <resultFolder>Results\vp9MvFreePlayback</resultFolder>
+        </VP9MvFreePlayback>
+        <HEVCFixedPlayback>
+            <Port>31502</Port>
+            <LogPath>Log\HEVCFixedPlayback</LogPath>
+            <resultFolder>Results\HEVCFixedPlayback</resultFolder>
+        </HEVCFixedPlayback>
+         <VP9FixedChrome>
+            <Port>31503</Port>
+            <LogPath>Log\VP9FixedChrome</LogPath>
+            <resultFolder>Results\VP9FixedChrome</resultFolder>
+        </VP9FixedChrome>
+    </SpecificCfg>
 </Vp9_Power_Test_Config>

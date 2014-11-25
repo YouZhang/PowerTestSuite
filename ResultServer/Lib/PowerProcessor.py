@@ -57,10 +57,12 @@ class powerProcessor(object):
         self.address = myConfig.address
         self.startButtonPos = myConfig.startButtonPos
         self.stopButtonPos = myConfig.stopButtonPos
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
         self.sock.bind(self.address)
         self.targetDataPos = myConfig.targetDataPos
+        self.logFilePath = myConfig.logFilePath
         self.isCapturing = False
+        common.appendLog("resultFile:"  + myConfig.resultFile,self.logFilePath)
 
     def getDataFromLVM(self,lvmFile):
         parseFlag = False
@@ -75,7 +77,7 @@ class powerProcessor(object):
                         parseFlag = True
             return self.powerMem.getFinalResult()
         except:
-            common.appendLog( "error in opening lvm file")
+            common.appendLog("error in opening lvm file",self.logFilePath)
             exit(-1)
 
     def startCapture(self):
@@ -86,32 +88,32 @@ class powerProcessor(object):
 
     def process(self):
         while True:
-            common.appendLog("receiving start/stop tag from client...")
+            common.appendLog("receiving start/stop tag from client...",self.logFilePath)
             case, addr = self.sock.recvfrom(2048)
             if not case:
-                common.appendLog("client has exist")
+                common.appendLog("client has exist",self.logFilePath)
                 break
-            common.appendLog("received: %s tag from %s" % (case, addr) )
+            common.appendLog("received: %s tag from %s" % (case, addr),self.logFilePath)
             lvmFile = self.inputRawData
             if("end" in case):
-                common.appendLog("all cases finished...\nResult diagram will be generated")
+                common.appendLog("all cases finished...\nResult diagram will be generated",self.logFilePath)
                 break
             elif(not self.isCapturing):
                 self.isCapturing = True
-                common.appendLog("start capturing %s power data..." % case)
+                common.appendLog("start capturing %s power data..." % case,self.logFilePath)
                 self.startCapture()
             else:
                 self.isCapturing = False
                 self.stopCapture()
-                common.appendLog("stop capturing %s power data..." % case)
+                common.appendLog("stop capturing %s power data..." % case,self.logFilePath)
                 lvmFile = renameFile(lvmFile,case)
                 powerData = self.getDataFromLVM(lvmFile)
                 message = "VCCIN1 : %s\nVCCIN2 : %s\nMemToal : %s\nDIMM : %s\nTotalPower:%s" % tuple(powerData)
-                common.appendLog(message)
+                common.appendLog(message,self.logFilePath)
                 powerData.insert(0,case)
                 self.resultDiagram.addData(powerData)
                 self.powerMem.__init__()
-                common.appendLog("--------------------------------------------------------------")
+                common.appendLog("--------------------------------------------------------------",self.logFilePath)
         self.sock.close()
         self.resultDiagram.addDiagram("PowerData",self.targetDataPos,self.chartType)
         self.resultDiagram.genDiagram()
@@ -119,20 +121,18 @@ class powerProcessor(object):
     def localProcess(self,lvmFileList):
         self.powerMem.__init__()
         for lvmFile in lvmFileList:
-            common.appendLog("processing %s ..." % lvmFile)
+            common.appendLog("processing %s ..." % lvmFile,self.logFilePath)
             powerData = self.getDataFromLVM(lvmFile)
             message = "VCCIN1 : %s\nVCCIN2 : %s\nMemTotal : %s\nDIMM : %s\nTotalPower:%s" % tuple(powerData)
-            common.appendLog(message)
+            common.appendLog(message,self.logFilePath)
             powerData.insert(0,lvmFile)
             self.resultDiagram.addData(powerData)
-            common.appendLog("--------------------------------------------------------------")
+            common.appendLog("--------------------------------------------------------------",self.logFilePath)
             self.powerMem.__init__()
         self.resultDiagram.addDiagram("PowerData",self.targetDataPos,self.chartType)
         self.resultDiagram.genDiagram()
 
 def renameFile(beforeName,newName):
     targetFile = 'RawData\%s.lvm' % newName
-    renameCMD = "move %s %s" % (beforeName,targetFile)
-    print renameCMD
-    os.system(renameCMD)
+    common.move(beforeName,targetFile)
     return targetFile

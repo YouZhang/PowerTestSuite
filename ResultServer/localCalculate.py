@@ -6,20 +6,21 @@ from Config import sysConfigFile
 import glob
 
 
-def initEnv():
+def initEnv(testMode):
     global myConfig
-    myConfig = testConfig()
+    myConfig = testConfig(testMode)
 
 
 def getLvmFileList():
     configFile = sysConfigFile()
-    path = configFile.getSysConfigItem("Misc","localDataPath")
+    path = configFile.getConfigContent("CommonCfg","localDataPath")
     filesType = path + "\\*.lvm"
     lvmFileList = glob.glob(filesType)
     return lvmFileList
 
 if __name__ == "__main__":
-    initEnv()
+    testMode = sys.argv[1]
+    initEnv(testMode)
     lvmFileList = getLvmFileList()
     mem = powerDataMem()
     localProcessor = powerProcessor(mem,myConfig)
