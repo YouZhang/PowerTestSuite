@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Vp9_Power_Client_Config version="1.0.0">
+	<Path>
+        <AppPath>app</AppPath>
+		<ClipsPath>Clips</ClipsPath>
+		<LogPath>Log</LogPath>        
+		<RunListPath>RunList</RunListPath>
+        <batFilePath>bat</batFilePath>
+        <localProcessPath>localProcess</localProcessPath>
+        <DriverPath>drv</DriverPath>
+        <SocResPath>socRes</SocResPath>
+        <BackupPath>backup</BackupPath>
+	</Path>
+    <DefaultConfig>
+        <ServerMachine>pba-ni-pc</ServerMachine>
+        <Port>31502</Port>
+		<PowerConfig>Balanced</PowerConfig>
+        <TempFolder>localProcess</TempFolder>
+        <SleepTime>20</SleepTime>
+        <AppHangService>False</AppHangService>
+        <MVP>True</MVP>
+        <powerMeasure>False</powerMeasure>
+        <RestartSvr>False</RestartSvr>
+        <SocWatch>False</SocWatch>
+        <Emon>False</Emon>
+	</DefaultConfig>   
+</Vp9_Power_Client_Config>

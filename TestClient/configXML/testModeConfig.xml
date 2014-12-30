@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestMode>
+    <MVFixedPlayback>
+        <AppName>mv_decoder_adv</AppName>
+        <AppPath>app\mv_decoder_adv\64</AppPath>
+        <AppBin>mv_decoder_adv_64.exe</AppBin>
+        <RegFile>reg\vp9h.reg</RegFile>
+        <ServerMachine>pba-ni-pc</ServerMachine>
+        <Port>31500</Port>
+        <Driver>ci-gen8_2014-29500 Release 64-bit</Driver>
+        <Decoder>VP9</Decoder>
+        <File>Input</File>
+        <Display>cmd Fullscreen overlay</Display>
+        <Control>fps</Control>
+    </MVFixedPlayback>
+    <MVFreePlayback>
+        <AppName>mv_decoder_adv</AppName>
+        <AppPath>app\mv_decoder_adv\64</AppPath>
+        <AppBin>mv_decoder_adv_64.exe</AppBin>    
+        <RegFile>reg\vp9h.reg</RegFile>
+        <ServerMachine>pba-ni-pc</ServerMachine>
+        <Port>31501</Port>
+        <Driver>manual-gen8_2014-11046 Release 64-bit</Driver>
+        <Decoder>VP9</Decoder>
+        <File>Input</File>
+        <Display>cmd Fullscreen flipex</Display>
+        <Control>fps</Control>
+    </MVFreePlayback>
+    <MVFreeDecode>
+        <AppName>mv_decoder_adv</AppName>
+        <AppPath>app\mv_decoder_adv\64</AppPath>
+        <AppBin>mv_decoder_adv_64.exe</AppBin>        
+        <RegFile>reg\vp9h.reg</RegFile>
+        <ServerMachine>pba-ni-pc</ServerMachine>
+        <Port>31502</Port>
+        <Driver>ci-gen8_2014-29500 Release 64-bit</Driver>
+        <Decoder>VP9</Decoder>
+        <File>Input</File>
+        <Display></Display>
+        <Control></Control>
+    </MVFreeDecode>
+    <MFXFixedPlayback>
+        <AppName>mfx_player</AppName>
+        <AppPath>app\mfx_player</AppPath>
+        <AppBin>mfx_player.exe</AppBin>
+        <RegFile>reg\hevch.reg</RegFile>
+        <ServerMachine>pba-ni-pc</ServerMachine>
+        <Port>31503</Port>
+        <Driver>ci-main-28601 Release 64-bit</Driver>
+        <Decoder>cmd</Decoder>
+        <File>Input  hevc</File>
+        <Display>Fullscreen</Display>
+        <Control>fps</Control>
+    </MFXFixedPlayback>
+    <MFXFreePlayback>
+        <AppName>mfx_player</AppName>
+        <AppPath>app\mfx_player</AppPath>
+        <AppBin>mfx_player.exe</AppBin>
+        <RegFile>reg\hevch.reg</RegFile>
+        <ServerMachine>pba-ni-pc</ServerMachine>
+        <Port>31504</Port>
+        <Driver>ci-main-28601 Release 64-bit</Driver>
+        <Decoder>cmd</Decoder>
+        <File>Input  hevc</File>
+        <Display>Fullscreen</Display>
+        <Control>fps</Control>
+    </MFXFreePlayback>
+    <MFXFreeDecode>
+        <AppName>mfx_player</AppName>
+        <AppPath>app\mfx_player</AppPath>
+        <AppBin>mfx_player.exe</AppBin>
+        <RegFile>reg\hevch.reg</RegFile>
+        <ServerMachine>pba-ni-pc</ServerMachine>
+        <Port>31505</Port>
+        <Driver>ci-main-28601 Release 64-bit</Driver>
+        <Decoder>cmd</Decoder>
+        <File>Input  hevc</File>
+        <Display></Display>
+        <Control></Control>
+    </MFXFreeDecode>
+    <ChromeFixedPlayback>
+        <AppName>chrome</AppName>
+        <AppPath>app\chrome</AppPath>
+        <AppBin>chrome.lnk</AppBin>
+        <RegFile>reg\vp9h.reg</RegFile>
+        <ServerMachine>pba-ni-pc</ServerMachine>
+        <Port>31506</Port>
+        <Driver>manual-main-91254 Release-Internal 64-bit</Driver>
+        <Decoder>VP9</Decoder>
+        <Display>Fullscreen</Display>
+        <File>Input  vp9</File>
+        <Control>fps</Control>
+    </ChromeFixedPlayback>
+    <FFPlayFixedPlayback>
+        <AppName>FFPlay</AppName>
+        <AppPath>app\ffplay</AppPath>
+        <AppBin>ffplay.exe</AppBin>
+        <RegFile>reg\vp9h.reg</RegFile>
+        <ServerMachine>pba-ni-pc</ServerMachine>
+        <Port>31507</Port>
+        <Driver>manual-main-91254 Release-Internal 64-bit</Driver>
+        <Decoder>cmd VP9</Decoder>
+        <Display>Fullscreen</Display>
+        <File>Input</File>
+        <Control>cmd</Control>
+    </FFPlayFixedPlayback>  
+    <FFMpegFreeDecode>
+        <AppName>FFMpeg</AppName>
+        <AppPath>app\ffmpeg</AppPath>
+        <AppBin>ffmpeg.exe</AppBin>
+        <RegFile>reg\vp9h.reg</RegFile>
+        <ServerMachine>pba-ni-pc</ServerMachine>
+        <Port>31508</Port>
+        <Driver>manual-main-91254 Release-Internal 64-bit</Driver>
+        <Decoder>cmd VP9</Decoder>
+        <Display></Display>
+        <File>Input Output</File>
+        <Control>cmd</Control>
+    </FFMpegFreeDecode>
+    <FFMpegFixedDecode>
+        <AppName>FFMpeg</AppName>
+        <AppPath>app\ffmpeg</AppPath>
+        <AppBin>ffmpeg.exe</AppBin>
+        <RegFile>reg\vp9h.reg</RegFile>
+        <ServerMachine>pba-ni-pc</ServerMachine>
+        <Port>31509</Port>        
+        <Driver>manual-main-91254 Release-Internal 64-bit</Driver>
+        <Decoder>cmd VP9</Decoder>
+        <Display></Display>
+        <File>Input Output</File>
+        <Control>cmd</Control>
+    </FFMpegFixedDecode>    
+    <PotPlayerFixedPlayback>
+        <AppName>PotPlayer32</AppName>
+        <AppPath>app\potplayer</AppPath>
+        <AppBin>Potplayer32.lnk</AppBin>
+        <RegFile>reg\vp9h.reg</RegFile>
+        <ServerMachine>pba-ni-pc</ServerMachine>
+        <Port>31510</Port>
+        <Driver>manual-main-91254 Release-Internal 64-bit</Driver>
+        <Driver></Driver>
+        <Decoder></Decoder>
+        <Display></Display>
+        <File>Input</File>
+        <Control></Control>
+    </PotPlayerFixedPlayback>       
+</TestMode> 

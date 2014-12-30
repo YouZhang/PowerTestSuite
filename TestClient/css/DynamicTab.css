@@ -1,0 +1,72 @@
+.TabZone
+{
+font-size: 12px;
+width: 100%;
+background: #fff;
+}
+.TabZone ul
+{
+position: relative;
+display: block;
+float: left;
+padding: 0 0 0 0px;
+padding: 0px 0px 0px 10px;
+list-style: none;
+height: 26px;
+z-index: 99999;
+background: #ebebeb url(../images/tabBackGround.gif) repeat-x top;
+width: 100%;
+}
+.TabZone ul li
+{
+float: left;
+display: block;
+margin: 5px 3px 0 0;
+padding: 0 15px;
+cursor: default;
+height: 20px;
+line-height: 20px;
+}
+.TabZone ul li.ActiveCSS
+{
+background: url(../images/tabOn.gif) repeat-x top;
+color: #38b0ff;
+height: 22px;
+line-height: 22px;
+vertical-align: middle;
+text-align: center;
+border-left: solid 1px #1d4c94;
+border-top: solid 1px #1d4c94;
+border-right: solid 1px #1d4c94;
+}
+.TabZone ul li.InactiveCSS
+{
+color: #38b0ff;
+background: url(../images/tabOut.gif) repeat-x top;
+height: 22px;
+line-height: 22px;
+vertical-align: middle;
+text-align: center;
+border-left: solid 1px #1d4c94;
+border-top: solid 1px #1d4c94;
+border-right: solid 1px #1d4c94;
+}
+.TabZone div
+{
+position: relative;
+width: 100%;
+height: 100%;
+z-index: 0;
+margin-top: 3px;
+}
+.TabZone div div
+{
+height: 100%;
+width: 100%;
+}
+.TabZone div div iframe
+{
+position: relative;
+width: 100%;
+height: 100%;
+}

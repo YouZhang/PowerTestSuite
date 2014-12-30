@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Apps>
+    <mv_decoder_adv>
+        <Options>
+            <Decoder>
+                <cmd></cmd>
+                <HEVC>--hevc</HEVC>
+                <VP9>--vp9</VP9>
+            </Decoder>
+            <File>
+                <cmd></cmd>
+                <Input cmd="-i">pwd\clipName.webm</Input>
+                <Output cmd="-o">dumpFile.yuv</Output>
+                <Bit10>-backbuffer D3DFMT_A2R10G10B10</Bit10>
+            </File>
+            <Display>
+                <cmd>--disp</cmd>
+                <Fullscreen>--full</Fullscreen>
+                <Method>
+                    <flip>--flip</flip>
+                    <flipex>--flipex</flipex>
+                    <overlay>--overlay</overlay>
+                </Method>
+            </Display>
+            <Control>
+                <cmd></cmd>
+                <length cmd="--limit">frameNum</length>
+                <fps cmd="--fps targetFPS ">
+                    <F24>film</F24>
+                    <F25>pal</F25>
+                    <F30>ntsc</F30>
+                    <F60>ntsc60</F60>
+                    <F120>ntsc120</F120>
+                    <free>asap</free>
+                </fps>
+            </Control>
+        </Options>
+    </mv_decoder_adv>
+    <mfx_player>
+        <Options>
+            <Decoder>
+                <cmd>-d3d -hw_strict -dec:advance 24</cmd>
+                <HEVC></HEVC>
+                <VP9></VP9>
+            </Decoder>
+            <File>
+                <cmd></cmd>
+                <Input>
+                    <hevc cmd="-i:hevc">pwd\clipName.265</hevc>
+                    <vp9 cmd="-i:webm">pwd\clipName.webm</vp9>
+                </Input>
+                <Output cmd="-o:oFormat">dumpFile.yuv</Output>
+                <Bit10>-backbuffer D3DFMT_A2R10G10B10</Bit10>
+            </File>
+            <Display>
+                <cmd></cmd>
+                <Fullscreen>-fullscreen -decode_plugin_guid 33a61c0b4c27454ca8d85dde757c6f8e -perf_opt</Fullscreen>
+                <Method>
+                    <flip></flip>
+                    <flipex></flipex>
+                    <overlay></overlay>
+                </Method>
+            </Display>
+            <Control>
+                <cmd></cmd>
+                <length cmd="-n">frameNum</length>
+                <fps cmd="-fps targetFPS ">
+                    <F24>24</F24>
+                    <F25>25</F25>
+                    <F30>30</F30>
+                    <F60>60</F60>
+                    <F120>120</F120>
+                    <free></free>
+                </fps>
+            </Control>
+        </Options>
+    </mfx_player>
+    <chrome>
+        <Options>
+            <Decoder>
+                <cmd></cmd>
+                <HEVC></HEVC>
+                <VP9></VP9>
+            </Decoder>
+            <File>
+                <cmd></cmd>
+                <Input>
+                    <hevc cmd="">pwd\clipName.html</hevc>
+                    <vp9 cmd="">pwd\clipName.html</vp9>
+                </Input>
+                <Output cmd=""></Output>
+                <Bit10></Bit10>
+            </File>
+            <Display>
+                <cmd></cmd>
+                <Fullscreen>--kiosk --ignore-resolution-limits-for-accelerated-video-decode</Fullscreen>
+                <Method>
+                    <flip></flip>
+                    <flipex></flipex>
+                    <overlay></overlay>
+                </Method>
+            </Display>
+            <Control>
+                <cmd></cmd>
+                <length cmd=""></length>
+                <fps cmd="">
+                    <F24></F24>
+                    <F30></F30>
+                    <F60></F60>
+                    <F120></F120>
+                    <free></free>
+                </fps>
+            </Control>
+        </Options>
+    </chrome>
+    <FFPlay>
+        <Options>
+            <Decoder>
+                <cmd>-vcodec</cmd>
+                <HEVC></HEVC>
+                <VP9>vp9</VP9>
+            </Decoder>
+            <File>
+                <cmd></cmd>
+                <Input cmd="">pwd\clipName.webm</Input>
+                <Output cmd="">dumpFile.yuv</Output>
+                <Bit10></Bit10>
+            </File>
+            <Display>
+                <cmd></cmd>
+                <Fullscreen>-fs</Fullscreen>
+                <Method>
+                    <flip></flip>
+                    <flipex></flipex>
+                    <overlay></overlay>
+                </Method>
+            </Display>
+            <Control>
+                <cmd>-autoexit -an -threads 4</cmd>
+                <length cmd="">frameNum</length>
+                <fps cmd="">
+                </fps>
+            </Control>
+        </Options>
+    </FFPlay>
+    <FFMpeg>
+        <Options>
+            <Decoder>
+                <cmd>-vcodec</cmd>
+                <HEVC></HEVC>
+                <VP9>vp9</VP9>
+            </Decoder>
+            <File>
+                <cmd></cmd>
+                <Input cmd="-i">pwd\clipName.webm</Input>
+                <Output cmd="">dumpFile.yuv</Output>
+                <Bit10></Bit10>
+            </File>
+            <Display>
+                <cmd></cmd>
+                <Fullscreen></Fullscreen>
+                <Method>
+                    <flip></flip>
+                    <flipex></flipex>
+                    <overlay></overlay>
+                </Method>
+            </Display>
+            <Control>
+                <cmd>-f rawvideo</cmd>
+                <length cmd="-frames">frameNum</length>
+                <fps cmd="">
+                </fps>
+            </Control>
+        </Options>
+    </FFMpeg>
+    <PotPlayer32>
+        <Options>
+            <Decoder>
+                <cmd></cmd>
+                <HEVC></HEVC>
+                <VP9></VP9>
+            </Decoder>
+            <File>
+                <cmd></cmd>
+                <Input cmd="">pwd\clipName.webm</Input>
+                <Output cmd=""></Output>
+                <Bit10></Bit10>
+            </File>
+            <Display>
+                <cmd></cmd>
+                <Fullscreen></Fullscreen>
+                <Method>
+                    <flip></flip>
+                    <flipex></flipex>
+                    <overlay></overlay>
+                </Method>
+            </Display>
+            <Control>
+                <cmd></cmd>
+                <length cmd=""></length>
+                <fps cmd="">
+                </fps>
+            </Control>
+        </Options>
+    </PotPlayer32>
+    <PotPlayer64>
+        <Options>
+            <Decoder>
+                <cmd></cmd>
+                <HEVC></HEVC>
+                <VP9></VP9>
+            </Decoder>
+            <File>
+                <cmd></cmd>
+                <Input cmd="">pwd\clipName.webm</Input>
+                <Output cmd=""></Output>
+                <Bit10></Bit10>
+            </File>
+            <Display>
+                <cmd></cmd>
+                <Fullscreen></Fullscreen>
+                <Method>
+                    <flip></flip>
+                    <flipex></flipex>
+                    <overlay></overlay>
+                </Method>
+            </Display>
+            <Control>
+                <cmd></cmd>
+                <length cmd=""></length>
+                <fps cmd="">
+                </fps>
+            </Control>
+        </Options>
+    </PotPlayer64>  
+</Apps>
