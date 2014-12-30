@@ -58,19 +58,22 @@ def backupData(src,mode):
     move(src,target=backFolder)
 
 def parseClipInfo(clip):
+    resolution = "xxx"
+    targetFPS = "xxx"
+    frameNum = "xxx"
+    tenBit = "8"
     resMatchedCase = ".*_(\d+)p.*"
     fpsMatchedCase = ".*_(\d+)fps.*"
-    frameMatchedCase = ".*_(\d+)frame.*"
+    frameMatchedCase = ".+_(\d+)frame.+"
     tenBitMatchedCase = ".*_m(\d+).*"
     try:
         resolution = matchCase(clip,resMatchedCase)
         targetFPS = matchCase(clip,fpsMatchedCase)
         frameNum = matchCase(clip,frameMatchedCase)
         tenBit = matchCase(clip,tenBitMatchedCase)
-        return resolution,targetFPS,frameNum,tenBit
     except:
         appendLog("the clip name do not match the standard..please check")
-        return -1
+    return resolution,targetFPS,frameNum,tenBit
 
 def matchCase(content,patten,pos=0):
     patten = re.compile(patten)
@@ -126,26 +129,43 @@ def getIp(machineName):
 def getRunCase(runList):
         i = 0
         runCase = None
+        paramList = []
         listToRunReadHandle = open(runList,'r')
         caseToRunList = listToRunReadHandle.readlines()
         listToRunReadHandle.close()
         while(i < len(caseToRunList)):
             try:
-                state,case = caseToRunList[i].split()
+                testCase = caseToRunList[i].split()
+                state = testCase[0]
+                case = testCase[1]
                 if( state == "1"):
                     runCase = case
+                    try:
+                        paramList = testCase[2:len(testCase)]
+                        # for param in paramList:
+                        #     param = param.lower()
+                        #     if( "emon" in param and "1" in param ):
+                        #         emon = "True"
+                        #     if( "socwatch" in param and "1" in param):
+                        #         socWatch = "True"
+                        #     if( "mvp" in param and "1" in param):
+                        #         mvp = "True"
+                        #     if( "power" in param and "1" in param):
+                        #         power = "True"
+                    except:
+                        appendLog(" no additional parameter found...")
                     break
                 i += 1
             except:
                 appendLog("empty list ...")
                 return None,None
-        return caseToRunList,runCase
+        return caseToRunList,runCase,paramList
 
 def removeDoneCase(testModeList,caseToRunList,toRemoveCase):
     appendLog("removing the case : %s" % toRemoveCase )
     for i in range(len(caseToRunList)):
         case = caseToRunList[i]
-        if( toRemoveCase in case):
+        if( toRemoveCase in case and '1' in case ):
             case = "0" + case[1:len(case)]
             caseToRunList[i] = case
             context = ''.join(caseToRunList)
@@ -154,9 +174,22 @@ def removeDoneCase(testModeList,caseToRunList,toRemoveCase):
             listToRunWriteHandle.close()
             return
 
+def getFileSize(fileName):
+    size = os.path.getsize(fileName)
+    return size
+            
+def checkProcStatus(procName):
+    cmd = "tasklist | findstr %s" % procName
+    ret = os.popen(cmd).readline()
+    if( ret != '' ):
+        return 1
+    else:
+        return 0
+            
 if __name__ == "__main__":
-    getDir("C:\Users\You\Documents\GitHub\PowerTestSuite\TestClient","a","b")
-    backupData("localProcess","Vp")
+    print checkProcStatus("chrome")
+    # getDir("C:\Users\You\Documents\GitHub\PowerTestSuite\TestClient","a","b")
+    # backupData("localProcess","Vp")
     # removeFiles("*.xlsx","..")
     # copy("..\mvp","..")
     # move("..\mvp","..")

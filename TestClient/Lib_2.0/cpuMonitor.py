@@ -18,9 +18,9 @@ class CPUMonitor(object):
         pass
         
     def taskMonitor(self):
-        cpuUtilization = psutil.cpu_percent(3)
+        cpuUtilization = psutil.cpu_percent(5)
         print cpuUtilization
-        if( cpuUtilization < 3.5 ):
+        if( cpuUtilization < 4.5 ):
             appendLog("current CPU Utilization: %s" % cpuUtilization)
             killFirefox = "taskkill -f -im firefox.exe"
             killChrome = "taskkill -f -im chrome.exe"
@@ -55,4 +55,4 @@ if __name__ == "__main__":
     time.sleep(10)
     while(1):
         cpuMonitor.taskMonitor()
-        time.sleep(1.8)
+        time.sleep(4.8)

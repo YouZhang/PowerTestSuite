@@ -13,5 +13,5 @@ options = {"py2exe":
 setup(
     options = options,
     zipfile=None,
-    console=[{"script": "Power&PerfTestClient.py" }]
+    console=[{"script": "..\\TestSuite.py" }]
     )

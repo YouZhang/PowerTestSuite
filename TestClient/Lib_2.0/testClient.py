@@ -9,7 +9,6 @@ import re
 import string
 from emon import EmonProcessor
 
-
 ##TODO:specific the OS
 def addStartupService():
     appendLog("adding the script into OS start up option...")
@@ -27,7 +26,7 @@ def restartOS():
     time.sleep(10)
 
 def enableChrome():
-    MSDKDir = '"C:\\Program Files\\Intel\\Media SDK"'
+    MSDKDir = '\'C:\\Program Files\\Intel\\Media SDK\''
     appendLog("enable chrome...")
     copy("chromeDll",MSDKDir)
     mftDll = getDir(MSDKDir,'mfx_mft_vp9vd_32.dll')
@@ -69,15 +68,23 @@ def getFpsInfo(fpsReport,gpuTime=None,frameNum=0):
     if( os.path.getsize(fpsReport) > 0 ):
         try:
             contents = open(fpsReport,"r").read()
-            pos = contents.rindex("fps") - 20
+            pos = contents.rindex("fps") - 10
             if("mfx" in contents):
                 patten = ".+ (\d+\.\d+) fps"
+                fps = matchCase(contents,patten,pos)
+                appendLog( "fps : %s" % fps)
+            elif("ffplay" in contents):
+                fps = int(frameNum) / string.atof(gpuTime)
+                appendLog( "fps : %s" % fps)
+            elif("ffmpeg" in contents):
+                patten = ".+fps= (\d+) .+"
                 fps = matchCase(contents,patten,pos)
                 appendLog( "fps : %s" % fps)
             elif("fps" in contents):
                 patten = ".+\((\d+\.\d+) fps"
                 fps = matchCase(contents,patten,pos)
                 appendLog( "fps : %s" % fps)
+
         except:
             appendLog("App hang or Chrome run, so fps could mot be found in the log..")
     else:
@@ -89,7 +96,7 @@ def getFpsInfo(fpsReport,gpuTime=None,frameNum=0):
     return fps
 
 def genSocWatchBat(clipName,clipLength):
-    cmd = '%s\\app\socwatch.lnk -t %s --max-detail -f ddr-bw  -f cpu-pstate  -f gfx-pstate -f sys -o %s\socRes\%s' % (pwd,clipLength,pwd,clipName)
+    cmd = '%s\\tool\socwatch.lnk -t %s --max-detail -f ddr-bw  -f cpu-pstate  -f gfx-pstate -f sys -o %s\socRes\%s' % (pwd,clipLength,pwd,clipName)
     batFileName = '%s\socWatchBat\soc.bat' % pwd
     fileHandle = open(batFileName,'w')
     fileHandle.write(cmd)
@@ -114,27 +121,33 @@ def getSocRes(socLogFile,*args):
         return ['0','0','0']
     for opt in args:
         if( opt in "GPU"):
-            aveGPUFreq = "0"
-            pos = content.index("GT P-State")
-            patten = re.compile("\n(\d+)MHz\s+,\s+(\d+\.\d+)%,.*")
-            gpuFreqList = patten.findall(content,pos)
-            aveGPUFreq = calAveFreq(gpuFreqList)
-            appendLog("aveGPUFreq : %s" % aveGPUFreq)
-            result.append(aveGPUFreq)
+            try:
+                pos = content.index("GT P-State")
+                patten = re.compile("\n(\d+)MHz\s+,\s+(\d+\.\d+)%,.*")
+                gpuFreqList = patten.findall(content,pos)
+                aveGPUFreq = calAveFreq(gpuFreqList)
+                appendLog("aveGPUFreq : %s" % aveGPUFreq)
+                result.append(aveGPUFreq)
+            except:
+                result.append("Error")
         elif( opt in "CPU"):
-            aveCPUFreq = "0"
-            pos = content.index("AvgFreq")
-            matchedCase = ".*AvgFreq,\s+,\s+(\d+)MHz.*"
-            aveCPUFreq = int(matchCase(content,matchedCase,pos))
-            appendLog("aveCPUFreq : %s" % aveCPUFreq)
-            result.append(aveCPUFreq)
+            try:
+                pos = content.index("AvgFreq")
+                matchedCase = ".*AvgFreq,\s+,\s+(\d+)MHz.*"
+                aveCPUFreq = int(matchCase(content,matchedCase,pos))
+                appendLog("aveCPUFreq : %s" % aveCPUFreq)
+                result.append(aveCPUFreq)
+            except:
+                result.append("Error")
         elif( opt in "BW"):
-            memBandwidth = "0"
-            pos = content.index("Total Memory Bandwidth")
-            matchedCase = ".*=, (\d+\.\d+),\n"
-            memBandwidth = string.atof(matchCase(content,matchedCase,pos))
-            appendLog("BW : %s" % memBandwidth)
-            result.append(memBandwidth)
+            try:
+                pos = content.index("Total Memory Bandwidth")
+                matchedCase = ".*=, (\d+\.\d+),\n"
+                memBandwidth = string.atof(matchCase(content,matchedCase,pos))
+                appendLog("BW : %s" % memBandwidth)
+                result.append(memBandwidth)
+            except:
+                result.append("Error")
     return result
 
 def switchDisplay(clipResolution):
@@ -159,11 +172,27 @@ class testClient(object):
         else:
             command = batFileName
         if(self.testCfg.emon == "True"):
-            syncRun("emon_BDW.bat")
+            syncRun("emon.bat")
         if( self.testCfg.powerMeasure == "True"):
-            self.sock.sendto(clipNameToRun,self.myAppCfg.address)
-            cmdRun(command)
-            self.sock.sendto(clipNameToRun,self.myAppCfg.address)
+            try:
+                self.sock.sendto(clipNameToRun,self.myAppCfg.address)
+                cmdRun(command)
+                self.sock.sendto(clipNameToRun,self.myAppCfg.address)
+            except:
+                appendLog("Please check the network...")
+                exit(-1)
+            # try:
+            #     self.sock.sendto(clipNameToRun,self.myAppCfg.address)
+            #     cmdRun(command)
+            #     time.sleep(5)
+            #     while(True):
+            #         time.sleep(1)
+            #         if(checkProcStatus(self.myAppCfg.appName) == 0):
+            #             self.sock.sendto(clipNameToRun,self.myAppCfg.address)
+            #             break
+            # except:
+            #     appendLog("Please check the network...")
+            #     exit(-1)
         else:
             if(self.testCfg.socWatch == "True"):
                 appendLog("starting the SocWatch...")
@@ -171,9 +200,15 @@ class testClient(object):
                 syncAdminRun(cmd)
                 time.sleep(5)
                 cmdRun(command)
+                cmdRun("taskkill /f /im emon*")
                 #left some time to generate the final soc report
-                time.sleep(120)
-            cmdRun(command)
+                while( True ):
+                    time.sleep(5)
+                    if( checkProcStatus("socwatch") == 0):
+                        break
+            else:
+                cmdRun(command)
+        cmdRun("taskkill /f /im emon*")
         appendLog("%s case end..." % clipNameToRun)
 
     def postProcess(self,clip,frameNum):
@@ -233,17 +268,44 @@ class testClient(object):
         setPowerCfgCmd = 'powercfg /s %s' % guid
         appendLog("Current power config : %s mode" % myPowerConfig)
         cmdRun(setPowerCfgCmd)
-
+    
+    def overrideTestConfig(self,paramList):
+        for param in paramList:
+            paramLow = param.lower()
+            if( "sleep" in paramLow):
+                self.testCfg.sleepTime = int(paramList[-1])
+            if( "driver" in paramLow):
+                self.myAppCfg.driver = " ".join(paramList[1:len(paramList)])
+            if( "application" in paramLow ):
+                pos = paramList.index(param)
+                self.myAppCfg.appBinary = paramList[pos+1] + ' '
+            if( "codec" in paramLow):
+                pos = paramList.index(param)
+                self.myAppCfg.param["decoder"] = paramList[pos+1]
+            if( "runlist" in paramLow):
+                pos = paramList.index(param)
+                self.myAppCfg.runList ="RunList\\" + paramList[pos+1]
+            if( "emon" in paramLow and "1" in paramLow ):
+                self.testCfg.emon = "True"
+            if( "socwatch" in paramLow and "1" in paramLow):
+                self.testCfg.socWatch = "True"
+            if( "mvp" in paramLow and "1" in paramLow):
+                self.testCfg.MVP = "True"
+            if( "power" in paramLow and "1" in paramLow):
+                self.testCfg.powerMeasure = "True"
+        
     def run(self):
         appendLog("---------------------------start initail config---------------------------")
         self.setPowerConfig()
         # self.runReg()
         addStartupService()
-        appendLog("starting the app hang monitor service...")
-        syncAdminRun(self.testCfg.hangService.replace("pwd",pwd))
+        if( self.testCfg.hangService == "True"):
+            appendLog("starting the app hang monitor service...")
+            syncAdminRun("pwd\\Lib_2.0\\appHangMonitor.bat".replace("pwd",pwd))
         appendLog("---------------------------end inital config---------------------------")
         while True:
-            caseToRunList,caseToRun = getRunCase(self.myAppCfg.runList)
+            caseToRunList,caseToRun,paramList = getRunCase(self.myAppCfg.runList)
+            self.overrideTestConfig(paramList)
             if( caseToRun != None ):
                 appendLog("Current case : %s" % caseToRun)
                 if("end" in caseToRun):
@@ -257,32 +319,33 @@ class testClient(object):
                     self.sock.sendto(caseToRun, self.myAppCfg.address)
                     appendLog("%s  power test end..." % caseToRun)
                     removeDoneCase(self.myAppCfg.runList,caseToRunList,caseToRun)
-                elif("-" in caseToRun):
+                elif("Driver" in caseToRun):
                     cmdRun("tool\installDriver.exe %s" % self.myAppCfg.driver)
-                    enableChrome()
+                    # enableChrome()
                     removeDoneCase(self.myAppCfg.runList,caseToRunList,caseToRun)
                     restartOS()
                 else:
                     clipResolution,targetFPS,frameNum,tenBitOpt = parseClipInfo(caseToRun)
                     self.testApp.genBatFile(caseToRun,targetFPS,tenBitOpt,self.appCfgOpt)
-                    time.sleep(20)
-                    appendLog("switch display monitor...")
-                    switchDisplay(clipResolution)
+                    if( "decode" not in self.appCfgOpt.lower() ):
+                        appendLog("switch display monitor...")
+                        switchDisplay(clipResolution)
                     clipLength = int(frameNum) / int (targetFPS)
                     appendLog("clip length : %s" % clipLength)
-                    time.sleep(15)
+                    appendLog("will sleep %s" % self.testCfg.sleepTime)
+                    time.sleep(self.testCfg.sleepTime)                    
                     self.runCase(caseToRun,clipLength)
                     fps,gpuUsage,cpuUsage,pkgPower = self.postProcess(caseToRun,frameNum)
                     if( fps != '0'):
                         removeDoneCase(self.myAppCfg.runList,caseToRunList,caseToRun)
                     if(self.testCfg.restartSvr == "True"):
-                        time.sleep(15)
+                        time.sleep(self.testCfg.sleepTime)
                         restartOS()                        
                     else:
-                        time.sleep(60)
+                        time.sleep(self.testCfg.sleepTime)
                 appendLog("-------------------------------------------------")
             else:
-                appendLog( "all case test done!...")
+                appendLog( "all cases done!...")
                 appendLog("finished...")
                 self.sock.close()
                 # removeStartupService()

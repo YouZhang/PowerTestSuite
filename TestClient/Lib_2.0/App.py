@@ -14,7 +14,7 @@ class App(object):
             try:
                 item = list(item)
                 for option in item:
-                    if( option.tag in self.appConfig.param[type]):
+                    if( option.tag in self.appConfig.param[type].split()):
                         if( option.attrib != {} ):
                             self.param += option.attrib["cmd"] + " "
                         if( '\n' not in option.text ):
@@ -26,10 +26,9 @@ class App(object):
     def genCMDParam(self):
         self.getParamByType("display",self.appConfig.optionsItem.find("Display"))
         self.getParamByType("decoder",self.appConfig.optionsItem.find("Decoder"))
-        self.getParamByType("control",self.appConfig.optionsItem.find("Control"))
         self.getParamByType("file",self.appConfig.optionsItem.find("File"))
-
-
+        self.getParamByType("control",self.appConfig.optionsItem.find("Control"))
+        
     def getFPSParam(self,targetFPS,mode):
         fpsOpt = self.appConfig.optionsItem.find("Control").find("fps")
         fpsParam = None
@@ -47,7 +46,7 @@ class App(object):
 
     def genBatFile(self,clipName,targetFPS,tenBitOpt,mode):
         self.genTenBitParam(tenBitOpt)
-        cmd = self.appConfig.appBinary + self.param + " > log.txt"
+        cmd = self.appConfig.appBinary + self.param + " > log.txt 2>&1"
         clip = getDir(self.testCfg.clipsPath,clipName)
         fpsOpt = self.getFPSParam(targetFPS,mode)
         if( fpsOpt != None):

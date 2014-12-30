@@ -1,3 +1,3 @@
 cd %~dp0
-python %~dp0\TestSuite.py
+%~dp0\PnPTestSuite_Beta1_0.exe
 pause

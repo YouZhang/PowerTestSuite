@@ -5,23 +5,23 @@ from xml.etree import ElementTree as ET
 class appConfig(object):
 
     def __init__(self,mode):
-        appPath = configFile.getConfigContent("TestMode",mode,"AppPath")
-        appBin = configFile.getConfigContent("TestMode",mode,"AppBin")
-        serverName = configFile.getConfigContent("TestMode",mode,"ServerMachine")
+        appPath = testModeCfgFile.getConfigContent(mode,"AppPath")
+        appBin = testModeCfgFile.getConfigContent(mode,"AppBin")
+        serverName = testModeCfgFile.getConfigContent(mode,"ServerMachine")
         ip = getIp(serverName)
-        port = int(configFile.getConfigContent("TestMode",mode,"Port"))
+        port = int(testModeCfgFile.getConfigContent(mode,"Port"))
         self.address = (ip,port)
-        self.appName = configFile.getConfigContent("TestMode",mode,"AppName")
-        self.regFile = configFile.getConfigContent("TestMode",mode,"RegFile")
-        self.optionsItem = configFile.getSysConfigItem("Apps",self.appName,"Options")
-        self.driver = configFile.getConfigContent("TestMode",mode,"Driver")
-        self.runList = configFile.getConfigContent("TestMode",mode,"RunList")
+        self.appName = testModeCfgFile.getConfigContent(mode,"AppName")
+        self.regFile = testModeCfgFile.getConfigContent(mode,"RegFile")
+        self.driver = testModeCfgFile.getConfigContent(mode,"Driver")
+        self.runList = " "           
         self.appBinary = getDir(appPath,appBin) + " "
         self.param = {}
-        self.param["decoder"] = configFile.getConfigContent("TestMode",mode,"Decoder")
-        self.param["file"] = configFile.getConfigContent("TestMode",mode,"File")
-        self.param["display"] = configFile.getConfigContent("TestMode",mode,"Display")
-        self.param["control"] = configFile.getConfigContent("TestMode",mode,"Control")
+        self.param["decoder"] = testModeCfgFile.getConfigContent(mode,"Decoder")
+        self.param["file"] = testModeCfgFile.getConfigContent(mode,"File")
+        self.param["display"] = testModeCfgFile.getConfigContent(mode,"Display")
+        self.param["control"] = testModeCfgFile.getConfigContent(mode,"Control")
+        self.optionsItem = appOptFile.getSysConfigItem(self.appName,"Options")
 
 class testConfig(object):
 
@@ -30,30 +30,30 @@ class testConfig(object):
         self.getMiscCfg()
 
     def getFilePathCfg(self):
-        self.runListPath = configFile.getConfigContent("Path","RunListPath")
-        self.driverPath = configFile.getConfigContent("Path","DriverPath")
-        self.appPath = configFile.getConfigContent("Path","AppPath")
-        self.clipsPath = configFile.getConfigContent("Path","ClipsPath")
-        self.batFilePath = configFile.getConfigContent("Path","batFilePath")
-        self.localProcessPath = configFile.getConfigContent("Path","localProcessPath")
-        self.socResPath = configFile.getConfigContent("Path","SocResPath")
-        self.backupPath = configFile.getConfigContent("Path","BackupPath")
-        self.logFilePath = configFile.getConfigContent("Path","LogPath")
+        self.driverPath = sysConfigFile.getConfigContent("Path","DriverPath")
+        self.appPath = sysConfigFile.getConfigContent("Path","AppPath")
+        self.clipsPath = sysConfigFile.getConfigContent("Path","ClipsPath")
+        self.batFilePath = sysConfigFile.getConfigContent("Path","batFilePath")
+        self.localProcessPath = sysConfigFile.getConfigContent("Path","localProcessPath")
+        self.socResPath = sysConfigFile.getConfigContent("Path","SocResPath")
+        self.backupPath = sysConfigFile.getConfigContent("Path","BackupPath")
+        self.logFilePath = sysConfigFile.getConfigContent("Path","LogPath")
         self.logFile = getDir(self.logFilePath,localTime+".txt")
 
     def getMiscCfg(self):
-        self.powerConfig = configFile.getConfigContent("Misc","PowerConfig")
-        self.hangService = configFile.getConfigContent("Misc","AppHangService")
-        self.tempFolder = configFile.getConfigContent("Misc","TempFolder")
-        self.MVP = configFile.getConfigContent("Misc","MVP")
-        self.restartSvr = configFile.getConfigContent("Misc","RestartSvr")
-        self.socWatch = configFile.getConfigContent("Misc","SocWatch")
-        self.emon = configFile.getConfigContent("Misc","Emon")
-        self.powerMeasure = configFile.getConfigContent("Misc","powerMeasure")
+        self.powerConfig = sysConfigFile.getConfigContent("DefaultConfig","PowerConfig")
+        self.hangService = sysConfigFile.getConfigContent("DefaultConfig","AppHangService")
+        self.tempFolder = sysConfigFile.getConfigContent("DefaultConfig","TempFolder")
+        self.MVP = sysConfigFile.getConfigContent("DefaultConfig","MVP")
+        self.restartSvr = sysConfigFile.getConfigContent("DefaultConfig","RestartSvr")
+        self.socWatch = sysConfigFile.getConfigContent("DefaultConfig","SocWatch")
+        self.emon = sysConfigFile.getConfigContent("DefaultConfig","Emon")
+        self.powerMeasure = sysConfigFile.getConfigContent("DefaultConfig","powerMeasure")
+        self.sleepTime = int(sysConfigFile.getConfigContent("DefaultConfig","SleepTime"))
 
-class sysConfigFile(object):
+class configFile(object):
 
-    def __init__(self,xmlFile = 'sysConfig.xml'):
+    def __init__(self,xmlFile):
         self.rootNode = ET.parse(xmlFile).getroot()
 
     def getSysConfigItem(self,*args):
@@ -76,7 +76,15 @@ class sysConfigFile(object):
         item = self.getSysConfigItem(*args)
         return item.tag
 
-configFile = sysConfigFile()
+def initConfigFile():
+    global sysConfigFile
+    global appOptFile
+    global testModeCfgFile
+    sysConfigFile = configFile("configXML\\SysConfig.xml")
+    appOptFile = configFile("configXML\\testAppOpt.xml")
+    testModeCfgFile = configFile("configXML\\testModeConfig.xml")
+
+initConfigFile()
 
 if __name__ == "__main__":
     configFile.getSysConfigItem("Apps","mv_decoder_adv")

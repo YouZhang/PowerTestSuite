@@ -1,0 +1,12 @@
+<script>
+function showStorage(){
+    var storage = window.localStorage;
+    for(var i=0;i<storage.length;i++){  
+        document.write(storage.key(i)+ " -> " + '<br>');
+        document.write(storage.getItem(storage.key(i)) + "<br>")
+    }
+}
+
+showStorage();
+
+</script>
