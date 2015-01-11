@@ -15,8 +15,9 @@
 <body>
 <script type="text/javascript">
     var fileList = getFilesFromPath("Clips");
-    var clipInfo = clipFilter(fileList);
-    plotUI(clipInfo);
+    var testModeList = addSelectOpt("testMode","testModeConfig.xml");
+    clipInfo = clipFilter(fileList);    
+    plotUI(clipInfo,testModeList);
 </script>
 <body>
 <script>
@@ -26,8 +27,6 @@ for (var i =0; i < testModeList.length;i++ ){
     checkBoxStatus( testModeList[i] );
 }
 addSelectContent();
-
-
 document.getElementById("addSelectionButton").onclick=function(){
     index = index + 1;
     var section = addSelection(options)
@@ -35,7 +34,7 @@ document.getElementById("addSelectionButton").onclick=function(){
     content += section;
     content += '<input type="button" class="button" value="delete"  onclick="del('+index+')"/></div>'
     document.getElementById("pullSelect").innerHTML += content;
-    addSelectContent();    
+    addSelectContent();
 }
 </script>
 <html>

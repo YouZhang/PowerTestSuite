@@ -109,6 +109,16 @@ WebFXTabPane.prototype.setSelectedIndex = function ( n ) {
 			WebFXTabPane.setCookie( "webfxtab_" + this.element.id, n );	// session cookie
 	}
 };
+
+WebFXTabPane.prototype.changeColor = function ( n ) {
+	if (this.selectedIndex != n) {
+		this.selectedIndex = n;
+		this.pages[ this.selectedIndex ].hightlight();
+		
+		if ( this.useCookie )
+			WebFXTabPane.setCookie( "webfxtab_" + this.element.id, n );	// session cookie
+	}
+};
 	
 WebFXTabPane.prototype.getSelectedIndex = function () {
 	return this.selectedIndex;
@@ -229,6 +239,15 @@ WebFXTabPage.prototype.show = function () {
 	this.element.style.display = "block";
 };
 
+WebFXTabPage.prototype.hightlight = function () {
+	var el = this.tab;
+	var s = el.className + " highlight";
+	s = s.replace(/ +/g, " ");
+	el.className = s;
+	
+	this.element.style.display = "block";
+};
+
 WebFXTabPage.prototype.hide = function () {
 	var el = this.tab;
 	var s = el.className;
@@ -240,6 +259,10 @@ WebFXTabPage.prototype.hide = function () {
 	
 WebFXTabPage.prototype.select = function () {
 	this.tabPane.setSelectedIndex( this.index );
+};
+
+WebFXTabPage.prototype.highLightTab = function () {
+	this.tabPane.changeColor( this.index );
 };
 	
 WebFXTabPage.prototype.dispose = function () {

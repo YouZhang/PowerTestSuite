@@ -8,7 +8,11 @@ from Diagram import diagram
 from common import *
 from emon import EmonProcessor
 
-mode = sys.argv[1]
+try:
+    mode = sys.argv[1]
+except:
+    mode = "ChromeFixedPlayback"
+    
 initRow = ("Cases","CPU","GPU","FPS","AveCPUFreq","AveGPUFreq","MemBandwidth","pkgPower")
 resultFolder = getDir("Results",mode)
 mkdir(resultFolder)
@@ -16,7 +20,6 @@ resultFile = getDir("Results",mode,localTime + ".xlsx")
 myDiagram = diagram(resultFile,initRow,10)
 tempFolder = 'localProcess'
 myClientTestCfg = testConfig()
-
 
 def getResult():
     emonRes = ['0','0','0']

@@ -272,18 +272,18 @@ class testClient(object):
     def overrideTestConfig(self,paramList):
         for param in paramList:
             paramLow = param.lower()
+            pos = paramList.index(param)
             if( "sleep" in paramLow):
                 self.testCfg.sleepTime = int(paramList[-1])
             if( "driver" in paramLow):
                 self.myAppCfg.driver = " ".join(paramList[1:len(paramList)])
             if( "application" in paramLow ):
-                pos = paramList.index(param)
                 self.myAppCfg.appBinary = paramList[pos+1] + ' '
+            if( "restart" in paramLow ):
+                self.myAppCfg.restartSvr = True
             if( "codec" in paramLow):
-                pos = paramList.index(param)
                 self.myAppCfg.param["decoder"] = paramList[pos+1]
             if( "runlist" in paramLow):
-                pos = paramList.index(param)
                 self.myAppCfg.runList ="RunList\\" + paramList[pos+1]
             if( "emon" in paramLow and "1" in paramLow ):
                 self.testCfg.emon = "True"
@@ -349,6 +349,6 @@ class testClient(object):
                 appendLog("finished...")
                 self.sock.close()
                 # removeStartupService()
-                cmdRun("localCalculate.py %s" % self.appCfgOpt)
+                cmdRun("localCalculate.exe %s" % self.appCfgOpt)
                 backupData(src="localProcess",mode=self.appCfgOpt)
                 break

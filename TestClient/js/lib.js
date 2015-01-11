@@ -31,7 +31,11 @@ function abPath(){
 
 function getSelectedVal(i){
     var pullSelect = document.getElementById("TestMode"+i);
-    var appendOpt = '1\t{0} '.format(pullSelect.value);    
+    var appendOpt = '1\t{0} '.format(pullSelect.value); 
+    var restartService = document.getElementById("restartService");
+    if( restartService.checked ){
+        appendOpt += "restartService: 1 ";
+    }    
     driver = document.getElementById(pullSelect.value+"Driver").value; 
     var runListFileName = generateRunList(pullSelect.value)
     pullSelect = document.getElementById("Codec"+i);
@@ -45,7 +49,7 @@ function getSelectedVal(i){
 
 
 function generateRunList(testMode){
-    
+
     if( fileExist("RunList\\" + testMode + runListIndex)){
         runListIndex += 1;
     }
@@ -103,7 +107,7 @@ function launch(){
     testModeVal="";
     caseListVal="";
     var testModeList = document.getElementsByName("testMode[]");
-    var advConfig = document.getElementById("AdvConfig");    
+    var advConfig = document.getElementById("AdvConfig");  
     var codecArray = new Array();
     var testAppArray = new Array();
     var testModeArrat = new Array();
@@ -300,14 +304,31 @@ function addSelection(options){
     // var content = '<div id="pullSelect">';
     
     var content = '';
-    for ( var i = 0; i < options.length;i++){
+    for ( var i = 0; i < options.length-1;i++){
         content += '<b>{0}:</b> <SELECT id=\'{1}\'></SELECT>&nbsp;&nbsp;&nbsp;&nbsp'.format(options[i],options[i]+index);
     }
-    
+    content += '<b>{0}:</b> <SELECT id=\'{1}\'></SELECT>&nbsp;&nbsp;&nbsp;&nbsp'.format(options[i],options[i]+index);
     return content;
 }
 
-
+function highlightTab(pullSelect){
+    var pageArray = tp2.pages;
+    for(var i = 0; i < pageArray.length;i++){
+        className = pageArray[i].tab.className;
+        if( pullSelect.value == pageArray[i].aElement.innerText ){
+            pageArray[i].tab.className = 'tab highlight';
+        }
+    }
+}
+function cancelHighlight(pullSelect){
+    var pageArray = tp2.pages;
+    for(var i = 0; i < pageArray.length;i++){
+        className = pageArray[i].tab.className;
+        if( pullSelect.value == pageArray[i].aElement.innerText ){
+            pageArray[i].tab.className = 'tab';
+        }
+    }
+}
 
 
 function addSelectContent(){
@@ -347,17 +368,28 @@ function addTab1(testModeList,options){
     }
     content += '</div>';
     content += '<div class="tab-page">';
+    content += '<input type="checkBox" id="AdvConfig" onchange=\'checkBoxStatus(this);\' value=\'{0}\'/><b>Enable Advanced Mode</b> -> use the specific app to run case<br>';
+    content += '<input type="checkBox" id="restartService" value=\'{0}\'/><b>Enable Restart Service</b> -> Restart after finshing every single case<br>';    
     content += addSleepTimeOpt();
     content += '<h2 class="tab">Advanced Mode</h2>';
-    content += '<input type="checkBox" id="AdvConfig" onchange=\'checkBoxStatus(this);\' value=\'{0}\'/><b>Enable Advanced Mode</b> -> use the specific app to run case<br>';
     content += '<div id="pullSelect">';    
     content += '<hr style="border:4px double #abcdef"/><br>';
     content += addSelection(options);    
     content += '</div><br>';        
-    content += '<input type="button" class="button" id="addSelectionButton" value="AddTestMode"/><br><br>';
+    content += '<input type="button" class="button" id="addSelectionButton" value="AddTestMode"/>';
+    content += '<input type="button" align="right" value="confirmTestMode" class="button" onclick="confirmTestMode()"/><br><br>'
     content += '<hr style="border:4px double #abcdef"/>';
     content += '</div></div>';
     document.write(content);    
+}
+
+
+function confirmTestMode(){
+    for (var i = 1; i <= index;i++){
+        var pullSelect = document.getElementById("TestMode"+i);
+        highlightTab(pullSelect);
+    }
+    
 }
 
 function addTab2(clipInfo,testModeList){
@@ -366,11 +398,13 @@ function addTab2(clipInfo,testModeList){
     var hevcClipList = clipInfo.hevcClipList;
     var otherClipList = clipInfo.otherClipList;    
     testOptList = new Array("Cases","Emon","Power","SocWatch","MVP");
-    content = '<div class="tab-pane" id="tabPane2">';
+    content = '<div class="tab-pane" id="tabPane2"><script type="text/javascript">tp2 = new WebFXTabPane( document.getElementById( "tabPane2" ) );</script>';
+        
     for( var i = 0;i < testModeList.length;i++){
-        content += '<div class="tab-page">';
+        content += '<div class="tab-page" id="{0}">'.format(testMode);        
         var testMode = testModeList[i];
         content += '<h2 class="tab">{0}</h2>'.format(testMode);
+        content += '<script type="text/javascript">tp2.addTabPage( document.getElementById( "{0}" ) );</script>'.format(testMode);
         for( j = 0;j < testOptList.length;j++){
             var testOpt = testOptList[j];
             // add select all;
@@ -511,6 +545,11 @@ function checkBoxStatus(element){
 
 
 function del(o){
+    for(var i = 1; i <= testModeList.length;i ++){
+        var pullSelect = document.getElementById("TestMode"+i);
+        if( pullSelect == null) break;
+        cancelHighlight(pullSelect);
+    }    
     document.getElementById("pullSelect").removeChild(document.getElementById("testConfig"+o));
     index -= 1;
 }
