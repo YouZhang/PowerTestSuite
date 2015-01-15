@@ -1,11 +1,11 @@
 .dynamic-tab-pane-control .tab-page {
 	height:		auto;
-    width:      900px;
+    width:      100%;
 }
 
 .dynamic-tab-pane-control .tab-page .dynamic-tab-pane-control .tab-page {
 	height:		auto;
-    width:      900px;
+    width:      100%;
 }
 
 html, body {

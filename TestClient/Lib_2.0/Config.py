@@ -50,6 +50,7 @@ class testConfig(object):
         self.emon = sysConfigFile.getConfigContent("DefaultConfig","Emon")
         self.powerMeasure = sysConfigFile.getConfigContent("DefaultConfig","powerMeasure")
         self.sleepTime = int(sysConfigFile.getConfigContent("DefaultConfig","SleepTime"))
+        self.driver = None
 
 class configFile(object):
 

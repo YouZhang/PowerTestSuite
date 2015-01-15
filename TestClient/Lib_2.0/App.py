@@ -33,7 +33,7 @@ class App(object):
         fpsOpt = self.appConfig.optionsItem.find("Control").find("fps")
         fpsParam = None
         for opt in list(fpsOpt):
-            if( targetFPS in opt.tag ):
+            if( str(targetFPS) in opt.tag ):
                 fpsParam = opt.text
             if( "Free" in mode and "free" in opt.tag):
                 fpsParam =  opt.text
@@ -46,17 +46,16 @@ class App(object):
 
     def genBatFile(self,clipName,targetFPS,tenBitOpt,mode):
         self.genTenBitParam(tenBitOpt)
-        cmd = self.appConfig.appBinary + self.param + " > log.txt 2>&1"
+        cmd = self.appConfig.appBinary + self.param + ' > "log.txt" 2>&1'
         clip = getDir(self.testCfg.clipsPath,clipName)
         fpsOpt = self.getFPSParam(targetFPS,mode)
         if( fpsOpt != None):
             cmd = cmd.replace("targetFPS",fpsOpt)
         cmd = cmd.replace("clipName",clip).replace("log",clipName).replace("pwd",pwd)
-        batFile = getDir(self.testCfg.batFilePath,clipName+".bat")
+        batFile = getDir(self.testCfg.batFilePath,clipName.replace(' ','_')+".bat")
         handle = file(batFile,'w')
         handle.write(cmd)
         handle.close()
-        return batFile
 
 if __name__ == "__main__":
     pass

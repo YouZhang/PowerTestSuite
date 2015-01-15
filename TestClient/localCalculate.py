@@ -7,6 +7,7 @@ import string
 from Diagram import diagram
 from common import *
 from emon import EmonProcessor
+from emailOperation import *
 
 try:
     mode = sys.argv[1]
@@ -26,7 +27,7 @@ def getResult():
     rootPath = myClientTestCfg.localProcessPath
     for parent,dirNamesList,fileNameList in os.walk(rootPath):
         for dirName in dirNamesList:
-            clipResolution,targetFPS,frameNum,tenBitOpt = parseClipInfo(dirName)
+            resolution,targetFPS,frameNum,tenBitOpt,clipLength = parseClipInfo(dirName)
             tempPath = os.path.join(rootPath,dirName)
             cpuReport = os.path.join(tempPath,dirName + "_CPU_Usage.csv")
             gpuReport = os.path.join(tempPath,dirName + "_GPU_Usage.csv")
@@ -56,5 +57,33 @@ def getResult():
     myDiagram.addDiagram("Ave Pkg Power","H","bar")
     myDiagram.genDiagram()
 
+def getTestModeInfo(testModeList):
+    listToRunReadHandle = open(testModeList,'r')
+    case = listToRunReadHandle.readline()
+    listToRunReadHandle.close()
+    optList = case.split(" ")
+    receiverList = None
+    app = ''
+    for opt in optList:
+        if( "email" in opt ):
+            pos = optList.index(opt)
+            receiverList = optList[pos + 1]
+        if( "App" in opt):
+            pos = optList.index(opt)
+            appPath = optList[pos + 1]
+            app = appPath.split("\\")[-1]            
+    return receiverList,app
+        
 if __name__ == "__main__":
+    receiverList,app = getTestModeInfo("testModeList")
     getResult()
+    driverVersion = getDriverVersion("Display")
+    sysInfo = getSysVersion()
+    osInfo = '_'.join([sysInfo['OS'],sysInfo['arch'],sysInfo['buildNum']])
+    tempList = [mode,sysInfo['OS'],sysInfo['arch'],sysInfo['buildNum']]
+    subject = '_'.join(tempList)
+    content = open('emailTemplate\\testEnv.html','r').read()
+    content = content % (getCPUInfo(),getMemInfo(),osInfo,driverVersion,mode,app)
+    # content = "Test Env.\nPlatform : %s\nMemory : %s\nOS info: %s\nDriver Version : %s\nTest Mode : %s\nTest App : %s\n" % (getCPUInfo(),getMemInfo(),osInfo,driverVersion,mode,app)
+    if( receiverList ):
+        sendEmail(subject,content,resultFile,receiverList)

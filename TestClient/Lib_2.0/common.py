@@ -10,13 +10,13 @@ localTime = time.strftime("%Y-%m-%d_%H-%M-%S",time.localtime())
 pwd = os.getcwd()
 
 def cmdRun(cmd):
-    appendLog("running command : %s" % cmd)
-    os.system(cmd)
+    appendLog('running command : %s' % cmd)
+    os.system("%s" % cmd)
 
 def mkdir(path):
     appendLog("make directory %s" % path)
     try:
-        cmd = "mkdir %s" % path
+        cmd = 'mkdir "%s"' % path
         cmdRun(cmd)
     except WindowsError:
         appendLog("%s already exited..." % path)
@@ -31,7 +31,7 @@ def removeFiles(patten,path=None):
     else:
         targetFiles = patten
     appendLog("removing files : %s" % patten)
-    cmdRun("del %s" % targetFiles)
+    cmdRun('del "%s"' % targetFiles)
 
 def copy(src,target):
     appendLog("copy /y files from : %s to %s" % (src,target))
@@ -39,7 +39,7 @@ def copy(src,target):
 
 def move(src,target):
     appendLog("move files from %s to %s" % (src,target))
-    cmdRun("move %s %s" % (src,target))
+    cmdRun('move "%s" "%s"' % (src,target))
 
 def appendLog(message,folder="Log"):
     print message
@@ -58,27 +58,67 @@ def backupData(src,mode):
     move(src,target=backFolder)
 
 def parseClipInfo(clip):
-    resolution = "xxx"
-    targetFPS = "xxx"
-    frameNum = "xxx"
-    tenBit = "8"
+    resolution,targetFPS,frameNum = parseClipName(clip)
+    tenBit = '8'
+    clipLength = None
+    command = 'tool\MediaInfo_x86\MediaInfo.exe -f "clips\\%s*"' % clip
+    keyWords = ['Bit rate','Width','Bit Depth','Frame rate','Duration','Frame count']
+    info = {}
+    clipInfoList = os.popen(command).readlines()
+    for clipInfo in clipInfoList:
+        for keyWord in keyWords:
+            clipInfo = clipInfo.replace(" ","")
+            patten1 = r"%s:(\d*).*\n" % keyWord.replace(" ","")
+            patten2 = r"%s:(\d*\.\d+).*\n" % keyWord.replace(" ","")
+            val1 = matchCase(clipInfo,patten1,0)
+            val2 = matchCase(clipInfo,patten2,0)
+            if( val1 and val2 ):
+                value = val2
+            elif( val1 is not None):
+                value = val1
+            else:
+                continue
+            if(info.has_key(keyWord) ):
+                if( len(value) > len(info[keyWord]) ):
+                    info[keyWord] = value
+            else:
+                info[keyWord] = value
+
+    if( info['Width'] == "3840"):
+        resolution = "2160"
+    else:
+        resolution = "1080"
+    if( info.has_key('Bit Depth')):
+        tenBit = '10'
+    if( info.has_key('Frame rate')):
+        targetFPS = int(round(float(info['Frame rate'])))
+    if( info.has_key('Duration')):
+        clipLength = info['Duration']
+    if( info.has_key('Frame count')):
+        frameNum = info['Frame count']
+    if( clipLength ):
+        clipLength = int(frameNum) / int (targetFPS)
+    for key in info:
+        appendLog("%s : %s" % (key,info[key]))
+
+    return resolution,targetFPS,frameNum,tenBit,clipLength
+
+def parseClipName(clip):
     resMatchedCase = ".*_(\d+)p.*"
     fpsMatchedCase = ".*_(\d+)fps.*"
     frameMatchedCase = ".+_(\d+)frame.+"
-    tenBitMatchedCase = ".*_m(\d+).*"
-    try:
-        resolution = matchCase(clip,resMatchedCase)
-        targetFPS = matchCase(clip,fpsMatchedCase)
-        frameNum = matchCase(clip,frameMatchedCase)
-        tenBit = matchCase(clip,tenBitMatchedCase)
-    except:
-        appendLog("the clip name do not match the standard..please check")
-    return resolution,targetFPS,frameNum,tenBit
+    resolution = matchCase(clip,resMatchedCase)
+    targetFPS = matchCase(clip,fpsMatchedCase)
+    frameNum = matchCase(clip,frameMatchedCase)
+    return resolution,targetFPS,frameNum
 
 def matchCase(content,patten,pos=0):
     patten = re.compile(patten)
     matchedItem = patten.match(content,pos)
-    return matchedItem.group(1)
+    if( matchedItem ):
+        return matchedItem.group(1)
+    else:
+        return None
 
 def keyPress(targetStr):
     for i in range(len(targetStr)):
@@ -130,36 +170,36 @@ def getRunCase(runList):
         i = 0
         runCase = None
         paramList = []
+        driver = None
         listToRunReadHandle = open(runList,'r')
         caseToRunList = listToRunReadHandle.readlines()
         listToRunReadHandle.close()
         while(i < len(caseToRunList)):
             try:
-                testCase = caseToRunList[i].split()
+                testCase = caseToRunList[i].split('\t')
                 state = testCase[0]
                 case = testCase[1]
                 if( state == "1"):
                     runCase = case
                     try:
                         paramList = testCase[2:len(testCase)]
-                        # for param in paramList:
-                        #     param = param.lower()
-                        #     if( "emon" in param and "1" in param ):
-                        #         emon = "True"
-                        #     if( "socwatch" in param and "1" in param):
-                        #         socWatch = "True"
-                        #     if( "mvp" in param and "1" in param):
-                        #         mvp = "True"
-                        #     if( "power" in param and "1" in param):
-                        #         power = "True"
+                        for param in paramList:
+                            if( "Driver" in param ):
+                                driver = param.split("*")[-1].strip()
+                                testCase.pop()
+                                caseToRunList[i] = "\t".join(testCase) + '\n'
+                                context = ''.join(caseToRunList)
+                                listToRunWriteHandle = open(runList,'w')
+                                listToRunWriteHandle.write(context)
+                                listToRunWriteHandle.close()
                     except:
                         appendLog(" no additional parameter found...")
                     break
                 i += 1
             except:
-                appendLog("empty list ...")
-                return None,None
-        return caseToRunList,runCase,paramList
+                appendLog("empty testModelist ...")
+                exit(-1)
+        return caseToRunList,runCase,driver,paramList
 
 def removeDoneCase(testModeList,caseToRunList,toRemoveCase):
     appendLog("removing the case : %s" % toRemoveCase )
@@ -188,6 +228,7 @@ def checkProcStatus(procName):
             
 if __name__ == "__main__":
     print checkProcStatus("chrome")
+    parseClipInfo('big_60fps_5000kbps_2397frame_1080p_m8')
     # getDir("C:\Users\You\Documents\GitHub\PowerTestSuite\TestClient","a","b")
     # backupData("localProcess","Vp")
     # removeFiles("*.xlsx","..")

@@ -31,18 +31,27 @@ function abPath(){
 
 function getSelectedVal(i){
     var pullSelect = document.getElementById("TestMode"+i);
-    var appendOpt = '1\t{0} '.format(pullSelect.value); 
+    var appendOpt = '1\t{0}\t'.format(pullSelect.value); 
     var restartService = document.getElementById("restartService");
     if( restartService.checked ){
         appendOpt += "restartService: 1 ";
-    }    
-    driver = document.getElementById(pullSelect.value+"Driver").value; 
+    }
+    var emailCheckBox = document.getElementById('emailCheckBox');
+    var emailListObj = document.getElementById('emailList');
+    if( emailCheckBox.checked ){
+        appendOpt += "emailList: {0} ".format(emailListObj.value);
+    }
+    // driver = document.getElementById(pullSelect.value+"Driver").value; 
+    driverLabel = document.getElementById(i+"Driver").value;
     var runListFileName = generateRunList(pullSelect.value)
     pullSelect = document.getElementById("Codec"+i);
-    appendOpt += "{0}: {1} ".format("Codec",pullSelect.value);
+    appendOpt += "{0}: {1}\t".format("Codec",pullSelect.value);
     pullSelect = document.getElementById("App"+i);
-    appendOpt += "{0}: {1} ".format("Application",appArray[pullSelect.value]);
-    appendOpt += " {0}: {1}".format("RunList",runListFileName);
+    appendOpt += "{0}: {1}\t".format("Application",appArray[pullSelect.value]);
+    appendOpt += "{0}: {1}\t".format("RunList",runListFileName);
+    if( driverLabel != ''){
+        appendOpt += "{0}:*{1}".format("Driver",driverLabel)
+    }    
     appendOpt += '\n';
     return appendOpt;
 }
@@ -68,16 +77,8 @@ function generateRunList(testMode){
     }
     var sleepTimeOpt = "sleepTime: " + sleepTime
     for(var j = 0;j < runList.length;j++){
-        var optIndex = j-1;
-        if( runList[j].checked && j == 0){
-            if(driver == ""){
-                alert("input driver label for " + testMode);
-                return -1;
-            }else{
-                caseListVal = caseListVal + "1\t" + runList[j].value + " driver: {0}\n".format(driver);
-            }                    
-        }
-        else if(runList[j].checked){
+        var optIndex = j;
+        if(runList[j].checked){
             caseListVal = caseListVal + "1\t" + runList[j].value + "\t";
             if( emonList[optIndex].checked && j > 0){
                 caseListVal = caseListVal + emonList[optIndex].value +':1\t';
@@ -107,7 +108,7 @@ function launch(){
     testModeVal="";
     caseListVal="";
     var testModeList = document.getElementsByName("testMode[]");
-    var advConfig = document.getElementById("AdvConfig");  
+    var advConfig = document.getElementById("AdvConfig");
     var codecArray = new Array();
     var testAppArray = new Array();
     var testModeArrat = new Array();
@@ -120,7 +121,7 @@ function launch(){
     var indexTimes = 0;
     for (var i = 0; i < testModeList.length;i++ ){
         var pathArray = new Array();
-        driver = document.getElementById(testModeList[i].defaultValue+"Driver").value;        
+        // driver = document.getElementById(testModeList[i].defaultValue+"Driver").value;        
         if( testModeList[i].checked ){            
             runListFileName = generateRunList(testModeList[i].defaultValue);
             
@@ -300,14 +301,12 @@ function addSelectOpt(selectId,xmlFile){
     return ret;
 }
 
-function addSelection(options){
-    // var content = '<div id="pullSelect">';
-    
+function addSelection(options){    
     var content = '';
-    for ( var i = 0; i < options.length-1;i++){
+    for ( var i = 0; i < options.length;i++){
         content += '<b>{0}:</b> <SELECT id=\'{1}\'></SELECT>&nbsp;&nbsp;&nbsp;&nbsp'.format(options[i],options[i]+index);
     }
-    content += '<b>{0}:</b> <SELECT id=\'{1}\'></SELECT>&nbsp;&nbsp;&nbsp;&nbsp'.format(options[i],options[i]+index);
+    content += addDriverChangeCase(index,0)
     return content;
 }
 
@@ -320,11 +319,11 @@ function highlightTab(pullSelect){
         }
     }
 }
-function cancelHighlight(pullSelect){
+function cancelHighlight(testmode){
     var pageArray = tp2.pages;
     for(var i = 0; i < pageArray.length;i++){
         className = pageArray[i].tab.className;
-        if( pullSelect.value == pageArray[i].aElement.innerText ){
+        if( testmode == pageArray[i].aElement.innerText ){
             pageArray[i].tab.className = 'tab';
         }
     }
@@ -369,12 +368,13 @@ function addTab1(testModeList,options){
     content += '</div>';
     content += '<div class="tab-page">';
     content += '<input type="checkBox" id="AdvConfig" onchange=\'checkBoxStatus(this);\' value=\'{0}\'/><b>Enable Advanced Mode</b> -> use the specific app to run case<br>';
-    content += '<input type="checkBox" id="restartService" value=\'{0}\'/><b>Enable Restart Service</b> -> Restart after finshing every single case<br>';    
-    content += addSleepTimeOpt();
+    content += '<input type="checkBox" id="restartService" value=\'{0}\'/><b>Enable Restart Service</b> -> Restart after finshing every single case<br>';
+    content += addEmailList();
+    content += addSleepTimeOpt();    
     content += '<h2 class="tab">Advanced Mode</h2>';
     content += '<div id="pullSelect">';    
     content += '<hr style="border:4px double #abcdef"/><br>';
-    content += addSelection(options);    
+    content += addSelection(options);      
     content += '</div><br>';        
     content += '<input type="button" class="button" id="addSelectionButton" value="AddTestMode"/>';
     content += '<input type="button" align="right" value="confirmTestMode" class="button" onclick="confirmTestMode()"/><br><br>'
@@ -383,13 +383,24 @@ function addTab1(testModeList,options){
     document.write(content);    
 }
 
+function addEmailList(){
+    var content = "";
+    content += '<input type="checkBox" id="emailCheckBox" value="emailCheckBox"/><b>Enable Email Config : &nbsp;&nbsp;&nbsp;&nbsp;</b>'
+    content += '<input size=50 name="Email" type="text" id="emailList" placeholder="xxx@intel.com,yyy@intel.com"><br>'
+    return content;    
+}
 
 function confirmTestMode(){
+    for (var i = 0; i < testModeList.length;i++){
+        cancelHighlight(testModeList[i]);
+    }
     for (var i = 1; i <= index;i++){
         var pullSelect = document.getElementById("TestMode"+i);
         highlightTab(pullSelect);
-    }
-    
+    } 
+    var advConfig = document.getElementById("AdvConfig");
+    advConfig.checked = true;
+    checkBoxStatus(advConfig);
 }
 
 function addTab2(clipInfo,testModeList){
@@ -417,7 +428,7 @@ function addTab2(clipInfo,testModeList){
         //add line
         content += '<hr style="border:4px double #abcdef"/>';
         //add driver change case;
-        content += addDriverChangeCase(testMode,"Cases");
+        // content += addDriverChangeCase(testMode,"Cases");
         //add cases;
         //add new sub tab
         content += '<div class="tab-pane" id="tabPane4">';        
@@ -492,10 +503,11 @@ function addCaseOpt(clipList,testMode,testOptList){
         content += '<hr style="border:4px double #e8e8e8"/>';
     }
 }
-function addDriverChangeCase(testMode,testOpt){
+function addDriverChangeCase(flag,testOpt){
     content = "";
-    content += '<input type="checkBox" name="{0}" value="Change_Driver"/><b>Change_Driver</b>'.format(testMode+testOpt);
-    content += '<input size=50 name="Driver" type="text" id="{0}Driver" placeholder="Example:ci-gen8_2014-29500 Release 64-bit"><hr style="border:4px double #abcdef"/>'.format(testMode);
+    // content += '<input type="checkBox" name="{0}" value="Change_Driver"/><b>Change_Driver</b>'.format(testMode+testOpt);
+    content += '<b>Driver: </b><input size=45 name="Driver" type="text" id="{0}Driver" placeholder="Example:ci-gen8_2014-29500 Release 64-bit">&nbsp'.format(flag);
+    // content += '<hr style="border:4px double #abcdef"/>';
     return content;
 }
 
@@ -548,10 +560,11 @@ function del(o){
     for(var i = 1; i <= testModeList.length;i ++){
         var pullSelect = document.getElementById("TestMode"+i);
         if( pullSelect == null) break;
-        cancelHighlight(pullSelect);
+        cancelHighlight(pullSelect.value);
     }    
     document.getElementById("pullSelect").removeChild(document.getElementById("testConfig"+o));
     index -= 1;
+    confirmTestMode()
 }
 
 index = 1;
