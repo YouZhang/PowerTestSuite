@@ -64,6 +64,7 @@ def parseClipInfo(clip):
     command = 'tool\MediaInfo_x86\MediaInfo.exe -f "clips\\%s*"' % clip
     keyWords = ['Bit rate','Width','Bit Depth','Frame rate','Duration','Frame count']
     info = {}
+    info['Frame count'] = frameNum
     clipInfoList = os.popen(command).readlines()
     for clipInfo in clipInfoList:
         for keyWord in keyWords:
@@ -96,7 +97,7 @@ def parseClipInfo(clip):
         clipLength = info['Duration']
     if( info.has_key('Frame count')):
         frameNum = info['Frame count']
-    if( clipLength ):
+    if( clipLength == None ):
         clipLength = int(frameNum) / int (targetFPS)
     for key in info:
         appendLog("%s : %s" % (key,info[key]))
