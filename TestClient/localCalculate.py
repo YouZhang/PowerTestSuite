@@ -82,8 +82,6 @@ if __name__ == "__main__":
     osInfo = '_'.join([sysInfo['OS'],sysInfo['arch'],sysInfo['buildNum']])
     tempList = [mode,sysInfo['OS'],sysInfo['arch'],sysInfo['buildNum']]
     subject = '_'.join(tempList)
-    content = open('emailTemplate\\testEnv.html','r').read()
-    content = content % (getCPUInfo(),getMemInfo(),osInfo,driverVersion,mode,app)
-    # content = "Test Env.\nPlatform : %s\nMemory : %s\nOS info: %s\nDriver Version : %s\nTest Mode : %s\nTest App : %s\n" % (getCPUInfo(),getMemInfo(),osInfo,driverVersion,mode,app)
+    content = "Test Env.\nPlatform : %s\nMemory : %s\nOS info: %s\nDriver Version : %s\nTest Mode : %s\nTest App : %s\n" % (getCPUInfo(),getMemInfo(),osInfo,driverVersion,mode,app)
     if( receiverList ):
         sendEmail(subject,content,resultFile,receiverList)

@@ -291,7 +291,7 @@ class testClient(object):
             syncAdminRun("pwd\\Lib_2.0\\appHangMonitor.bat".replace("pwd",pwd))
         appendLog("---------------------------end inital config---------------------------")
         while True:
-            if( self.testCfg.driver ):
+            if( self.testCfg.driver != ''):
                 appendLog("%s will be installed" % self.testCfg.driver)
                 cmdRun("tool\installDriver.exe %s" % self.testCfg.driver)
                 # enableChrome()

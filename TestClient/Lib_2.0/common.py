@@ -84,17 +84,17 @@ def parseClipInfo(clip):
                     info[keyWord] = value
             else:
                 info[keyWord] = value
-
-    if( info['Width'] == "3840"):
-        resolution = "2160"
-    else:
-        resolution = "1080"
+    if( info.has_key('Width')):
+        if( int(info['Width']) >= 3840):
+            resolution = "2160"
+        else:
+            resolution = "1080"
     if( info.has_key('Bit Depth')):
         tenBit = '10'
     if( info.has_key('Frame rate')):
         targetFPS = int(round(float(info['Frame rate'])))
     if( info.has_key('Duration')):
-        clipLength = info['Duration']
+        clipLength = int(info['Duration']) / 1000
     if( info.has_key('Frame count')):
         frameNum = info['Frame count']
     if( clipLength == None ):
@@ -171,7 +171,7 @@ def getRunCase(runList):
         i = 0
         runCase = None
         paramList = []
-        driver = None
+        driver = ""
         listToRunReadHandle = open(runList,'r')
         caseToRunList = listToRunReadHandle.readlines()
         listToRunReadHandle.close()

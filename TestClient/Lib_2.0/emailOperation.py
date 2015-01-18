@@ -44,7 +44,7 @@ def sendEmail(subject,content,resultFile,receiverList):
     att1["Content-Type"] = 'application/octet-stream'
     att1["Content-Disposition"] = 'attachment; filename="*"'.replace("*",resultFileName)
     msg.attach(att1)
-    txt = MIMEText(content,'html')     
+    txt = MIMEText(content,_subtype='html',_charset='gb2312')     
     msg.attach(txt)
     strTo = receiverList.split(',')
     msg['to'] = ','.join(strTo)
