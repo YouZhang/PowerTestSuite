@@ -33,6 +33,7 @@ function getSelectedVal(i){
     var pullSelect = document.getElementById("TestMode"+i);
     var appendOpt = '1\t{0}\t'.format(pullSelect.value); 
     var restartService = document.getElementById("restartService");
+    var regOpt = document.getElementById("regOpt"+i).value;
     if( restartService.checked ){
         appendOpt += "restartService: 1 ";
     }
@@ -49,9 +50,12 @@ function getSelectedVal(i){
     pullSelect = document.getElementById("App"+i);
     appendOpt += "{0}: {1}\t".format("Application",appArray[pullSelect.value]);
     appendOpt += "{0}: {1}\t".format("RunList",runListFileName);
+    if( regOpt != ''){
+        appendOpt += "{0}: {1}\t".format("RegFile",regOpt)
+    }    
     if( driverLabel != ''){
         appendOpt += "{0}:*{1}".format("Driver",driverLabel)
-    }    
+    }
     appendOpt += '\n';
     return appendOpt;
 }
@@ -306,7 +310,9 @@ function addSelection(options){
     for ( var i = 0; i < options.length;i++){
         content += '<b>{0}:</b> <SELECT id=\'{1}\'></SELECT>&nbsp;&nbsp;&nbsp;&nbsp'.format(options[i],options[i]+index);
     }
+    content += '<br>'
     content += addDriverChangeCase(index,0)
+    content += addRegOpt(index)
     return content;
 }
 
@@ -370,7 +376,7 @@ function addTab1(testModeList,options){
     content += '<input type="checkBox" id="AdvConfig" onchange=\'checkBoxStatus(this);\' value=\'{0}\'/><b>Enable Advanced Mode</b> -> use the specific app to run case<br>';
     content += '<input type="checkBox" id="restartService" value=\'{0}\'/><b>Enable Restart Service</b> -> Restart after finshing every single case<br>';
     content += addEmailList();
-    content += addSleepTimeOpt();    
+    content += addSleepTimeOpt();
     content += '<h2 class="tab">Advanced Mode</h2>';
     content += '<div id="pullSelect">';    
     content += '<hr style="border:4px double #abcdef"/><br>';
@@ -506,7 +512,7 @@ function addCaseOpt(clipList,testMode,testOptList){
 function addDriverChangeCase(flag,testOpt){
     content = "";
     // content += '<input type="checkBox" name="{0}" value="Change_Driver"/><b>Change_Driver</b>'.format(testMode+testOpt);
-    content += '<b>Driver: </b><input size=45 name="Driver" type="text" id="{0}Driver" placeholder="Example:ci-gen8_2014-29500 Release 64-bit">&nbsp'.format(flag);
+    content += '<b>Driver: </b><input size=42 name="Driver" type="text" id="{0}Driver" placeholder="Example:ci-gen8_2014-29500 Release 64-bit">&nbsp'.format(flag);
     // content += '<hr style="border:4px double #abcdef"/>';
     return content;
 }
@@ -518,6 +524,12 @@ function addSleepTimeOpt(){
     return content;
 }
 
+function addRegOpt(flag){
+    content = "";
+    content += '<b>RegKey Config : </b>';
+    content += '<input size=42 name="reg" type="text" id="regOpt{0}" placeholder="input your reg file,eg. vp9h.reg;hevch.reg">'.format(flag);
+    return content;
+}
 
 function setLinkSrc( sStyle ) {	
     document.getElementById( "webfx-tab-style-sheet" ).disabled = sStyle != "webfx"		

@@ -63,7 +63,7 @@
         <Decoder>cmd</Decoder>
         <File>Input  hevc</File>
         <Display>Fullscreen</Display>
-        <Control>fps</Control>
+        <Control></Control>
     </MFXFreePlayback>
     <MFXFreeDecode>
         <AppName>mfx_player</AppName>
@@ -143,5 +143,19 @@
         <Display></Display>
         <File>Input</File>
         <Control></Control>
-    </PotPlayerFixedPlayback>       
+    </PotPlayerFixedPlayback>
+	<PDVDPlayback>
+        <AppName>PotPlayer32</AppName>
+        <AppPath>app\potplayer</AppPath>
+        <AppBin>Potplayer32.lnk</AppBin>
+        <RegFile>reg\vp9h.reg</RegFile>
+        <ServerMachine>pba-ni-pc</ServerMachine>
+        <Port>31511</Port>
+        <Driver>manual-main-91254 Release-Internal 64-bit</Driver>
+        <Driver></Driver>
+        <Decoder></Decoder>
+        <Display></Display>
+        <File>Input</File>
+        <Control></Control>
+    </PDVDPlayback>
 </TestMode> 

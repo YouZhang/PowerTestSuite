@@ -37,6 +37,7 @@ class testConfig(object):
         self.localProcessPath = sysConfigFile.getConfigContent("Path","localProcessPath")
         self.socResPath = sysConfigFile.getConfigContent("Path","SocResPath")
         self.backupPath = sysConfigFile.getConfigContent("Path","BackupPath")
+        self.regFilePath = sysConfigFile.getConfigContent("Path","RegPath")
         self.logFilePath = sysConfigFile.getConfigContent("Path","LogPath")
         self.logFile = getDir(self.logFilePath,localTime+".txt")
 

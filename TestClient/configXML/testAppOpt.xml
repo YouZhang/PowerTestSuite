@@ -232,5 +232,35 @@
                 </fps>
             </Control>
         </Options>
-    </PotPlayer64>  
+    </PotPlayer64>
+	<PDVD>
+        <Options>
+            <Decoder>
+                <cmd></cmd>
+                <HEVC></HEVC>
+                <VP9></VP9>
+            </Decoder>
+            <File>
+                <cmd></cmd>
+                <Input cmd="">pwd\clipName.mkv</Input>
+                <Output cmd=""></Output>
+                <Bit10></Bit10>
+            </File>
+            <Display>
+                <cmd></cmd>
+                <Fullscreen></Fullscreen>
+                <Method>
+                    <flip></flip>
+                    <flipex></flipex>
+                    <overlay></overlay>
+                </Method>
+            </Display>
+            <Control>
+                <cmd></cmd>
+                <length cmd=""></length>
+                <fps cmd="">
+                </fps>
+            </Control>
+        </Options>
+    </PDVD>
 </Apps>

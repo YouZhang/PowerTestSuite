@@ -46,12 +46,16 @@ class App(object):
 
     def genBatFile(self,clipName,targetFPS,tenBitOpt,mode):
         self.genTenBitParam(tenBitOpt)
+
         cmd = self.appConfig.appBinary + self.param + ' > "log.txt" 2>&1'
         clip = getDir(self.testCfg.clipsPath,clipName)
+      
         fpsOpt = self.getFPSParam(targetFPS,mode)
         if( fpsOpt != None):
             cmd = cmd.replace("targetFPS",fpsOpt)
         cmd = cmd.replace("clipName",clip).replace("log",clipName).replace("pwd",pwd)
+        if( "PDVD" in mode ):
+            cmd = getDir(pwd,clip)+'.mkv > %s.txt' % clip
         batFile = getDir(self.testCfg.batFilePath,clipName.replace(' ','_')+".bat")
         handle = file(batFile,'w')
         handle.write(cmd)

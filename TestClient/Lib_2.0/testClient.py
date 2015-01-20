@@ -8,6 +8,7 @@ import time
 import re
 import string
 from emon import EmonProcessor
+from emailOperation import getSysVersion
 
 ##TODO:specific the OS
 def addStartupService():
@@ -123,7 +124,7 @@ def getSocRes(socLogFile,*args):
         if( opt in "GPU"):
             try:
                 pos = content.index("GT P-State")
-                patten = re.compile("\n(\d+)MHz\s+,\s+(\d+\.\d+)%,.*")
+                patten = re.compile("[\n\s](\d+)MHz.+\s(\d+\.\d+)%.*")
                 gpuFreqList = patten.findall(content,pos)
                 aveGPUFreq = calAveFreq(gpuFreqList)
                 appendLog("aveGPUFreq : %s" % aveGPUFreq)
@@ -239,8 +240,14 @@ class testClient(object):
         return fps,gpuUsage,cpuUsage,emonRes
 
     def runReg(self):
-        cmd = "regedit /S %s" % self.myAppCfg.regFile
-        cmdRun(cmd)
+        regFileList = self.myAppCfg.regFile.split(';')
+        for regFile in regFileList:
+            cmd = "regedit /S %s" % getDir(pwd,self.testCfg.regFilePath,regFile)
+            batName = 'regBat.bat'
+            handle = open( batName,'w')
+            handle.write(cmd)
+            handle.close()
+            cmdRun(batName)
 
     def setPowerConfig(self):
         myPowerConfig = self.testCfg.powerConfig
@@ -263,9 +270,19 @@ class testClient(object):
             if( "sleep" in paramLow):
                 self.testCfg.sleepTime = int(param.split()[-1])
             if( "driver" in paramLow):
-                self.myAppCfg.driver = param.split()[-1]
+                driver = param.split('*')[-1]
+                driverOptList = driver.split()
+                driverLabel = driverOptList[0]
+                arch = getSysVersion()['arch']
+                if( len(driverOptList) >= 2 ):
+                    buildType = driverOptList[1]
+                else:
+                    buildType = 'Release'
+                self.testCfg.driver = ' '.join([driverLabel,buildType,arch])                
             if( "application" in paramLow ):
                 self.myAppCfg.appBinary = param.split()[-1] + ' '
+            if( "regfile" in paramLow):
+                self.myAppCfg.regFile = param.split()[-1]              
             if( "restart" in paramLow ):
                 self.myAppCfg.restartSvr = True
             if( "codec" in paramLow):
@@ -280,11 +297,13 @@ class testClient(object):
                 self.testCfg.MVP = "True"
             if( "power" in paramLow and "1" in paramLow):
                 self.testCfg.powerMeasure = "True"
+            if( "regfile" in paramLow):
+                self.testCfg.powerMeasure = "True"                
         
     def run(self):
         appendLog("---------------------------start initail config---------------------------")
         self.setPowerConfig()
-        # self.runReg()
+        self.runReg()
         addStartupService()
         if( self.testCfg.hangService == "True"):
             appendLog("starting the app hang monitor service...")
@@ -292,6 +311,8 @@ class testClient(object):
         appendLog("---------------------------end inital config---------------------------")
         while True:
             if( self.testCfg.driver != ''):
+                appendLog("Downloading %s" % self.testCfg.driver)
+                cmdRun("tool\downloadDriver.exe %s" % self.testCfg.driver)
                 appendLog("%s will be installed" % self.testCfg.driver)
                 cmdRun("tool\installDriver.exe %s" % self.testCfg.driver)
                 # enableChrome()

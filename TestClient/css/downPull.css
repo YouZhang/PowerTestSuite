@@ -1,12 +1,12 @@
-table{width:600px;overflow:hidden}
+table{width:1000px;overflow:hidden}
 #control,#control table,#control table td{ font-size:14px;}
-#control{ width:600px; background-color:#ccc; font-size:14px; font-color:#333333; text-align:center; }
-#control table{ width:600px; height:25px; overflow:hidden}
+#control{ width:900px; background-color:#ccc; font-size:14px; font-color:#333333; text-align:center; }
+#control table{ width:900px; height:25px; overflow:hidden}
 #control table li{ list-style:none;height:20px;line-height:20px; overflow:hidden}
 #control table .tabTit{background:#3A5FCD;}
 #control a { font-weight:normal; font-size:24px; color:#fff; text-decoration:none; padding-right:10px;}
 #control .testLink{ font-weight:bold; font-size:12px}
-.test{ width:600px;background-color:#f6f6f6;overflow:hidden; }
+.test{ width:900px;background-color:#f6f6f6;overflow:hidden; }
 .test li{ list-style:none; color:#000; font-size:13px; line-height:20px;}
 #control table,.test table{ margin:0 auto; text-align:center}
 .STYLE1 {

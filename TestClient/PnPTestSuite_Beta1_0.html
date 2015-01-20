@@ -18,6 +18,7 @@
     var testModeList = addSelectOpt("testMode","testModeConfig.xml");
     clipInfo = clipFilter(fileList);    
     plotUI(clipInfo,testModeList);
+    
 </script>
 <body>
 <script>
@@ -31,8 +32,10 @@ document.getElementById("addSelectionButton").onclick=function(){
     index = index + 1;
     var section = addSelection(options)
     var content = '<div id="testConfig'+index+'">'
+    content += '<hr style="border:4px double #abcdef"/>'
     content += section;
-    content += '<input type="button" class="button" value="delete"  onclick="del('+index+')"/></div>'
+    content += '<input type="button" class="button" value="delete"  onclick="del('+index+')"/>'
+    content += '</div>';
     document.getElementById("pullSelect").innerHTML += content;
     addSelectContent();
 }

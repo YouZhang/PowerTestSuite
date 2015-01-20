@@ -3,7 +3,8 @@
 	<Path>
         <AppPath>app</AppPath>
 		<ClipsPath>Clips</ClipsPath>
-		<LogPath>Log</LogPath>        
+		<LogPath>Log</LogPath>
+        <RegPath>reg</RegPath>
 		<RunListPath>RunList</RunListPath>
         <batFilePath>bat</batFilePath>
         <localProcessPath>localProcess</localProcessPath>
@@ -23,5 +24,6 @@
         <RestartSvr>False</RestartSvr>
         <SocWatch>False</SocWatch>
         <Emon>False</Emon>
-	</DefaultConfig>   
+	</DefaultConfig>
+    <TestMode>      
 </Vp9_Power_Client_Config>
