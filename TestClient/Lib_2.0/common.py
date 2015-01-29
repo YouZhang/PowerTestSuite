@@ -9,6 +9,12 @@ from KeyValue import VK_CODE
 localTime = time.strftime("%Y-%m-%d_%H-%M-%S",time.localtime())
 pwd = os.getcwd()
 
+def restartOS():
+    time.sleep(2)
+    command = 'shutdown -r -t 0'
+    cmdRun(command)
+    time.sleep(10)
+
 def cmdRun(cmd):
     appendLog('running command : %s' % cmd)
     os.system("%s" % cmd)
@@ -85,7 +91,7 @@ def parseClipInfo(clip):
             else:
                 info[keyWord] = value
     if( info.has_key('Width')):
-        if( int(info['Width']) >= 3840):
+        if( int(info['Width']) >= 3800):
             resolution = "2160"
         else:
             resolution = "1080"
@@ -103,6 +109,34 @@ def parseClipInfo(clip):
         appendLog("%s : %s" % (key,info[key]))
 
     return resolution,targetFPS,frameNum,tenBit,clipLength
+
+def waitProc(procName,interval=5):
+    while( True ):
+        time.sleep(interval)
+        if( checkProcStatus(procName) == 0):
+            break
+
+def runReg(regChain,regFolder):
+    regFileList = regChain.split(';')
+    batFile = 'regBat.bat'
+    for regFile in regFileList:
+        cmd = "regedit /S %s" % getDir(pwd,regFolder,regFile)
+        writeFile(cmd,batFile)
+        cmdRun(batFile)
+
+def waitApp(procName,interval=5):
+    if( 'Pot' in procName or 'Power' in procName ):
+        time.sleep(interval)
+        while( True ):
+            time.sleep(interval)
+            if( getProcCPUUtilize(procName[0:5] ) < 2 ):
+                killProcess( procName[0:5] )
+                break
+    else:
+        waitProc(procName[0:5],interval*3.5)
+
+def killProcess(procName):
+    cmdRun('taskkill /f /im %s*' % procName)
 
 def parseClipName(clip):
     resMatchedCase = ".*_(\d+)p.*"
@@ -220,16 +254,62 @@ def getFileSize(fileName):
     return size
             
 def checkProcStatus(procName):
-    cmd = "tasklist | findstr %s" % procName
+    cmd = "tasklist | findstr %s*" % procName
     ret = os.popen(cmd).readline()
     if( ret != '' ):
         return 1
     else:
         return 0
-            
+
+def checkISVAppState(procName):
+    cmd = "wmic process | findstr %s*" % procName
+    ret = os.popen(cmd).readline()
+    return ret
+
+def getProcCPUUtilize(procName,interval=1):
+    cpuTimeListPre = getProcCPUTime('System',procName)
+    time.sleep(interval)
+    cpuTimeListAfter = getProcCPUTime('System',procName)
+    idleTime = cpuTimeListAfter['System'] - cpuTimeListPre['System']
+    busyTime = cpuTimeListAfter['processTime'] - cpuTimeListPre['processTime']
+    cpuUtilization = 100 * busyTime / ( busyTime + idleTime )
+    return cpuUtilization
+
+def getProcCPUTime(*procList):
+    cpuTime = {}
+    systemTime = 0
+    processTime = 0
+    procPatten = "* ".join(procList)
+    cmd = 'wmic process get Caption,KernelModeTime,UserModeTime | findstr "%s"' % procPatten
+    procTimeList = os.popen(cmd).readlines()
+    patten = re.compile('\s+(\d+)\s+(\d+)')
+    for procTime in procTimeList:
+        tempTime = patten.findall(procTime,0)[0]
+        if( 'System' in procTime ):
+            systemTime += sum([int(tick) for tick in tempTime])
+        else:
+            processTime += sum([int(tick) for tick in tempTime])
+        cpuTime['System'] = systemTime
+        cpuTime['processTime'] = processTime
+    return  cpuTime
+
+def readFile(fileName):
+    handle = open(fileName,'r')
+    content = handle.read()
+    handle.close()
+    return content
+
+def writeFile(content,fileName):
+    handle = open(fileName,'w')
+    handle.write(content)
+    handle.close()
+
 if __name__ == "__main__":
-    print checkProcStatus("chrome")
-    parseClipInfo('big_60fps_5000kbps_2397frame_1080p_m8')
+    # print checkProcStatus("abc")
+    # print checkISVAppState("PotPlayer")
+    # print getProcCPUTime("System")
+    print getProcCPUUtilize("PowerDVD")
+    # parseClipInfo('big_60fps_5000kbps_2397frame_1080p_m8')
     # getDir("C:\Users\You\Documents\GitHub\PowerTestSuite\TestClient","a","b")
     # backupData("localProcess","Vp")
     # removeFiles("*.xlsx","..")

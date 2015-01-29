@@ -8,9 +8,86 @@ import time
 import re
 import string
 from emon import EmonProcessor
-from emailOperation import getSysVersion
+from SystemInfo import getSysVersion
+import sqlite3
+import getpass
 
 ##TODO:specific the OS
+
+##decorator
+
+def Emon_Decorator(function):
+    def decorator(testClient,command):
+        if( testClient.testCfg.emon == "True" ):
+            syncRun('emon.bat %s' % testClient.testCfg.osArch)
+            ret = function(testClient,command)
+            killProcess("emon")
+        else:
+            ret = function(testClient,command)
+        return ret
+    return decorator
+
+def MVP_Decorator(function):
+    def decorator(testClient,command):
+        if( testClient.testCfg.MVP == "True" ):
+            ret = function(testClient,command)
+            waitProc('mvp')
+        else:
+            ret = function(testClient,command)
+        return ret
+    return decorator
+
+def Power_Decorator(function):
+    def decorator(testClient,command):
+        if( testClient.testCfg.powerMeasure == "True" ):
+            try:
+                testClient.sock.sendto(testClient.caseToRun,testClient.myAppCfg.address)
+                ret = function(testClient,command)
+                testClient.sock.sendto(testClient.caseToRun,testClient.myAppCfg.address)
+            except:
+                appendLog("Please check the network...")
+                exit(-1)
+        else:
+            ret = function(testClient,command)
+        return ret
+    return decorator
+
+def Soc_Decorator(function):
+    def decorator(testClient,command):
+        if( testClient.testCfg.socWatch == "True" ):
+            appendLog("starting the SocWatch...")
+            syncAdminRun(command['socCommand'])
+            time.sleep(5)
+            ret = function(testClient,command)
+            waitProc("socwatch")
+        else:
+            ret = function(testClient,command)
+        return ret
+    return decorator
+
+def getNumberFromBlob(buffer):
+    info = None
+    tempBuffer = str(buffer)
+    bufferList = tempBuffer.split()
+    for item in bufferList:
+        [decodeFPS,droppedFrameRate] = item.split(',')
+        decodeFPS = filter(lambda c : c.isdigit() or c == '.',decodeFPS)
+        droppedFrameRate = filter(lambda c : c.isdigit() or c == '.',droppedFrameRate)
+        info = [decodeFPS,droppedFrameRate]
+    return info
+
+def getChromeFPS(clipName,localStorge='C:\Users\%s\AppData\Local\Chromium\User Data\Default\Local Storage\__0.localstorage'):
+    fpsInfo = None
+    user = getpass.getuser()
+    localStorge = localStorge % user
+    sqlConnection = sqlite3.connect(localStorge)
+    cursor = sqlConnection.cursor()
+    cursor.execute("select * from ItemTable")
+    for item in cursor.fetchall():
+        if( clipName in item[0] ):
+            fpsInfo = getNumberFromBlob(item[1])
+    return fpsInfo
+
 def addStartupService():
     appendLog("adding the script into OS start up option...")
     command = 'reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /v Client /t reg_sz /d "%s\\run.bat" /f' % pwd
@@ -19,12 +96,6 @@ def addStartupService():
 def removeStartupService():
     command = 'reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /v client /f'
     cmdRun(command)
-
-def restartOS():
-    time.sleep(2)
-    command = 'shutdown -r -t 0'
-    cmdRun(command)
-    time.sleep(10)
 
 def enableChrome():
     MSDKDir = '\'C:\\Program Files\\Intel\\Media SDK\''
@@ -66,7 +137,7 @@ def getGPUUsage(gpuReport):
 
 def getFpsInfo(fpsReport,gpuTime=None,frameNum=0):
     fps = "0"
-    if( os.path.getsize(fpsReport) > 0 ):
+    if( os.path.exists(fpsReport) and os.path.getsize(fpsReport) > 0 ):
         try:
             contents = open(fpsReport,"r").read()
             pos = contents.rindex("fps") - 10
@@ -87,17 +158,17 @@ def getFpsInfo(fpsReport,gpuTime=None,frameNum=0):
                 appendLog( "fps : %s" % fps)
 
         except:
-            appendLog("App hang or Chrome run, so fps could mot be found in the log..")
+            appendLog("App hang, so fps could mot be found in the log..")
     else:
         try:
             fps = int(frameNum) / string.atof(gpuTime)
-            appendLog( "chrome fps : %s" % fps)
+            appendLog( "fps (calculated by GPU Time) : %s" % fps)
         except ZeroDivisionError:
             appendLog("gpuTime = 0...")
     return fps
 
-def genSocWatchBat(clipName,clipLength):
-    cmd = '%s\\tool\socwatch.lnk -t %s --max-detail -f ddr-bw  -f cpu-pstate  -f gfx-pstate -f sys -o "%s\socRes\%s"' % (pwd,clipLength,pwd,clipName)
+def genSocWatchBat(clipName,clipLength,arch):
+    cmd = '%s\\tool\\socwatch\\%s\\socwatch.exe -t %s --max-detail -f ddr-bw  -f cpu-pstate  -f gfx-pstate -f sys -o "%s\socRes\%s"' % (pwd,arch,clipLength,pwd,clipName)
     batFileName = '%s\socWatchBat\soc.bat' % pwd
     fileHandle = open(batFileName,'w')
     fileHandle.write(cmd)
@@ -165,42 +236,29 @@ class testClient(object):
         self.testApp = App(self.myAppCfg,self.testCfg)
         self.testApp.genCMDParam()
 
-    def runCase(self,clipNameToRun,clipLength):
+    def prepareCommand(self,clipNameToRun,clipLength):
+        cmd = {}
         appendLog("%s case start..." % clipNameToRun)
         batFileName = getDir(self.testCfg.batFilePath,clipNameToRun + '.bat')
         if(self.testCfg.MVP == "True"):
             command = "MVP_Agent.exe -t %s" % batFileName
         else:
             command = batFileName
-        if(self.testCfg.emon == "True"):
-            syncRun("emon.bat")
-        if( self.testCfg.powerMeasure == "True"):
-            try:
-                self.sock.sendto(clipNameToRun,self.myAppCfg.address)
-                cmdRun(command)
-                self.sock.sendto(clipNameToRun,self.myAppCfg.address)
-            except:
-                appendLog("Please check the network...")
-                exit(-1)
-        else:
-            if(self.testCfg.socWatch == "True"):
-                appendLog("starting the SocWatch...")
-                cmd = genSocWatchBat(clipNameToRun,clipLength)
-                syncAdminRun(cmd)
-                time.sleep(5)
-                cmdRun(command)
-                cmdRun("taskkill /f /im emon*")
-                #left some time to generate the final soc report
-                while( True ):
-                    time.sleep(5)
-                    if( checkProcStatus("socwatch") == 0):
-                        break
-            else:
-                cmdRun(command)
-        cmdRun("taskkill /f /im emon*")
-        appendLog("%s case end..." % clipNameToRun)
+        socCommand = genSocWatchBat(clipNameToRun,clipLength,self.testCfg.osArch)
+        cmd['command'] = command
+        cmd['socCommand'] = socCommand
+        return cmd
+
+    @MVP_Decorator
+    @Soc_Decorator
+    @Emon_Decorator
+    @Power_Decorator
+    def runCase(self,cmd):
+        syncRun(cmd['command'])
+        waitApp(self.myAppCfg.appName,interval=1)
 
     def postProcess(self,clip,frameNum):
+        time.sleep(35)
         tempDataFolder = os.path.join(self.testCfg.tempFolder,clip)
         mkdir(tempDataFolder)
 
@@ -229,7 +287,6 @@ class testClient(object):
         gpuUsage,gpuTime = getGPUUsage(gpuReport)
         fps = getFpsInfo(fpsReport,gpuTime,frameNum)
         getSocRes(socWatchReport,"CPU","GPU","BW")
-        pkgPower = '0'
         try:
             myEmonProcessor = EmonProcessor(emonReport)
             emonRes = myEmonProcessor.run()
@@ -243,11 +300,7 @@ class testClient(object):
         regFileList = self.myAppCfg.regFile.split(';')
         for regFile in regFileList:
             cmd = "regedit /S %s" % getDir(pwd,self.testCfg.regFilePath,regFile)
-            batName = 'regBat.bat'
-            handle = open( batName,'w')
-            handle.write(cmd)
-            handle.close()
-            cmdRun(batName)
+            cmdRun(cmd)
 
     def setPowerConfig(self):
         myPowerConfig = self.testCfg.powerConfig
@@ -284,7 +337,7 @@ class testClient(object):
             if( "regfile" in paramLow):
                 self.myAppCfg.regFile = param.split()[-1]              
             if( "restart" in paramLow ):
-                self.myAppCfg.restartSvr = True
+                self.testCfg.restartSvr = 'True'
             if( "codec" in paramLow):
                 self.myAppCfg.param["decoder"] = param.split()[-1]
             if( "runlist" in paramLow):
@@ -302,14 +355,15 @@ class testClient(object):
         
     def run(self):
         appendLog("---------------------------start initail config---------------------------")
-        self.setPowerConfig()
-        self.runReg()
+        self.setPowerConfig()        
+        runReg(self.myAppCfg.regFile,self.testCfg.regFilePath)
         addStartupService()
         if( self.testCfg.hangService == "True"):
             appendLog("starting the app hang monitor service...")
             syncAdminRun("pwd\\Lib_2.0\\appHangMonitor.bat".replace("pwd",pwd))
         appendLog("---------------------------end inital config---------------------------")
         while True:
+            removeFiles("*.yuv")
             if( self.testCfg.driver != ''):
                 appendLog("Downloading %s" % self.testCfg.driver)
                 cmdRun("tool\downloadDriver.exe %s" % self.testCfg.driver)
@@ -318,6 +372,7 @@ class testClient(object):
                 # enableChrome()
                 restartOS()
             caseToRunList,caseToRun,driver,paramList = getRunCase(self.myAppCfg.runList)
+            self.caseToRun = caseToRun
             self.overrideTestConfig(paramList)
             if( caseToRun != None ):
                 appendLog("Current case : %s" % caseToRun)
@@ -340,9 +395,12 @@ class testClient(object):
                         switchDisplay(clipResolution)
                     appendLog("clip length : %s" % clipLength)
                     appendLog("will sleep %s" % self.testCfg.sleepTime)
-                    time.sleep(self.testCfg.sleepTime)                    
-                    self.runCase(caseToRun,clipLength)
+                    time.sleep(self.testCfg.sleepTime)
+                    cmd = self.prepareCommand(caseToRun,clipLength)
+                    self.runCase(cmd)
                     fps,gpuUsage,cpuUsage,pkgPower = self.postProcess(caseToRun,frameNum)
+                    if( 'chrome' in self.appCfgOpt.lower()):
+                        fps = getChromeFPS(caseToRun)
                     if( fps != '0'):
                         removeDoneCase(self.myAppCfg.runList,caseToRunList,caseToRun)
                     if(self.testCfg.restartSvr == "True"):
@@ -355,7 +413,6 @@ class testClient(object):
                 appendLog( "all cases done!...")
                 appendLog("finished...")
                 self.sock.close()
-                # removeStartupService()
                 cmdRun("localCalculate.exe %s" % self.appCfgOpt)
                 backupData(src="localProcess",mode=self.appCfgOpt)
                 break

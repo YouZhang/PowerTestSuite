@@ -4,7 +4,7 @@
         <AppName>mv_decoder_adv</AppName>
         <AppPath>app\mv_decoder_adv\64</AppPath>
         <AppBin>mv_decoder_adv_64.exe</AppBin>
-        <RegFile>reg\vp9h.reg</RegFile>
+        <RegFile>vp9h.reg;autoLogin.reg</RegFile>
         <ServerMachine>pba-ni-pc</ServerMachine>
         <Port>31500</Port>
         <Driver>ci-gen8_2014-29500 Release 64-bit</Driver>
@@ -17,7 +17,7 @@
         <AppName>mv_decoder_adv</AppName>
         <AppPath>app\mv_decoder_adv\64</AppPath>
         <AppBin>mv_decoder_adv_64.exe</AppBin>    
-        <RegFile>reg\vp9h.reg</RegFile>
+        <RegFile>vp9h.reg;autoLogin.reg</RegFile>
         <ServerMachine>pba-ni-pc</ServerMachine>
         <Port>31501</Port>
         <Driver>manual-gen8_2014-11046 Release 64-bit</Driver>
@@ -30,7 +30,7 @@
         <AppName>mv_decoder_adv</AppName>
         <AppPath>app\mv_decoder_adv\64</AppPath>
         <AppBin>mv_decoder_adv_64.exe</AppBin>        
-        <RegFile>reg\vp9h.reg</RegFile>
+        <RegFile>vp9h.reg;autoLogin.reg</RegFile>
         <ServerMachine>pba-ni-pc</ServerMachine>
         <Port>31502</Port>
         <Driver>ci-gen8_2014-29500 Release 64-bit</Driver>
@@ -43,7 +43,7 @@
         <AppName>mfx_player</AppName>
         <AppPath>app\mfx_player</AppPath>
         <AppBin>mfx_player.exe</AppBin>
-        <RegFile>reg\hevch.reg</RegFile>
+        <RegFile>hevch.reg;autoLogin.reg</RegFile>
         <ServerMachine>pba-ni-pc</ServerMachine>
         <Port>31503</Port>
         <Driver>ci-main-28601 Release 64-bit</Driver>
@@ -56,7 +56,7 @@
         <AppName>mfx_player</AppName>
         <AppPath>app\mfx_player</AppPath>
         <AppBin>mfx_player.exe</AppBin>
-        <RegFile>reg\hevch.reg</RegFile>
+        <RegFile>hevch.reg;autoLogin.reg</RegFile>
         <ServerMachine>pba-ni-pc</ServerMachine>
         <Port>31504</Port>
         <Driver>ci-main-28601 Release 64-bit</Driver>
@@ -69,7 +69,7 @@
         <AppName>mfx_player</AppName>
         <AppPath>app\mfx_player</AppPath>
         <AppBin>mfx_player.exe</AppBin>
-        <RegFile>reg\hevch.reg</RegFile>
+        <RegFile>hevch.reg;autoLogin.reg</RegFile>
         <ServerMachine>pba-ni-pc</ServerMachine>
         <Port>31505</Port>
         <Driver>ci-main-28601 Release 64-bit</Driver>
@@ -82,7 +82,7 @@
         <AppName>chrome</AppName>
         <AppPath>app\chrome</AppPath>
         <AppBin>chrome.lnk</AppBin>
-        <RegFile>reg\vp9h.reg</RegFile>
+        <RegFile>vp9h.reg;autoLogin.reg</RegFile>
         <ServerMachine>pba-ni-pc</ServerMachine>
         <Port>31506</Port>
         <Driver>manual-main-91254 Release-Internal 64-bit</Driver>
@@ -92,10 +92,10 @@
         <Control>fps</Control>
     </ChromeFixedPlayback>
     <FFPlayFixedPlayback>
-        <AppName>FFPlay</AppName>
+        <AppName>ffplay</AppName>
         <AppPath>app\ffplay</AppPath>
         <AppBin>ffplay.exe</AppBin>
-        <RegFile>reg\vp9h.reg</RegFile>
+        <RegFile>vp9h.reg;autoLogin.reg</RegFile>
         <ServerMachine>pba-ni-pc</ServerMachine>
         <Port>31507</Port>
         <Driver>manual-main-91254 Release-Internal 64-bit</Driver>
@@ -105,10 +105,10 @@
         <Control>cmd</Control>
     </FFPlayFixedPlayback>  
     <FFMpegFreeDecode>
-        <AppName>FFMpeg</AppName>
+        <AppName>ffmpeg</AppName>
         <AppPath>app\ffmpeg</AppPath>
         <AppBin>ffmpeg.exe</AppBin>
-        <RegFile>reg\vp9h.reg</RegFile>
+        <RegFile>vp9h.reg;autoLogin.reg</RegFile>
         <ServerMachine>pba-ni-pc</ServerMachine>
         <Port>31508</Port>
         <Driver>manual-main-91254 Release-Internal 64-bit</Driver>
@@ -118,10 +118,10 @@
         <Control>cmd</Control>
     </FFMpegFreeDecode>
     <FFMpegFixedDecode>
-        <AppName>FFMpeg</AppName>
+        <AppName>ffmpeg</AppName>
         <AppPath>app\ffmpeg</AppPath>
         <AppBin>ffmpeg.exe</AppBin>
-        <RegFile>reg\vp9h.reg</RegFile>
+        <RegFile>vp9h.reg;autoLogin.reg</RegFile>
         <ServerMachine>pba-ni-pc</ServerMachine>
         <Port>31509</Port>        
         <Driver>manual-main-91254 Release-Internal 64-bit</Driver>
@@ -134,7 +134,7 @@
         <AppName>PotPlayer32</AppName>
         <AppPath>app\potplayer</AppPath>
         <AppBin>Potplayer32.lnk</AppBin>
-        <RegFile>reg\vp9h.reg</RegFile>
+        <RegFile>vp9h.reg;autoLogin.reg</RegFile>
         <ServerMachine>pba-ni-pc</ServerMachine>
         <Port>31510</Port>
         <Driver>manual-main-91254 Release-Internal 64-bit</Driver>
@@ -145,10 +145,10 @@
         <Control></Control>
     </PotPlayerFixedPlayback>
 	<PDVDPlayback>
-        <AppName>PotPlayer32</AppName>
-        <AppPath>app\potplayer</AppPath>
-        <AppBin>Potplayer32.lnk</AppBin>
-        <RegFile>reg\vp9h.reg</RegFile>
+        <AppName>PowerDVD</AppName>
+        <AppPath>app\PowerDVD</AppPath>
+        <AppBin>PowerDVD.lnk</AppBin>
+        <RegFile>hevch.reg;autoLogin.reg</RegFile>
         <ServerMachine>pba-ni-pc</ServerMachine>
         <Port>31511</Port>
         <Driver>manual-main-91254 Release-Internal 64-bit</Driver>
@@ -158,4 +158,18 @@
         <File>Input</File>
         <Control></Control>
     </PDVDPlayback>
+	<tempMode>
+        <AppName>tempMode</AppName>
+        <AppPath>tempMode</AppPath>
+        <AppBin>tempMode.lnk</AppBin>
+        <RegFile></RegFile>
+        <ServerMachine>pba-ni-pc</ServerMachine>
+        <Port>12345</Port>
+        <Driver></Driver>
+        <Driver></Driver>
+        <Decoder></Decoder>
+        <Display></Display>
+        <File></File>
+        <Control></Control>
+    </tempMode>    
 </TestMode> 

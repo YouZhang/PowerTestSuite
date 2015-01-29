@@ -14,7 +14,6 @@
 	</Path>
     <DefaultConfig>
         <ServerMachine>pba-ni-pc</ServerMachine>
-        <Port>31502</Port>
 		<PowerConfig>Balanced</PowerConfig>
         <TempFolder>localProcess</TempFolder>
         <SleepTime>20</SleepTime>
@@ -25,5 +24,4 @@
         <SocWatch>False</SocWatch>
         <Emon>False</Emon>
 	</DefaultConfig>
-    <TestMode>      
 </Vp9_Power_Client_Config>

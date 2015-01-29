@@ -35,7 +35,7 @@ function getSelectedVal(i){
     var restartService = document.getElementById("restartService");
     var regOpt = document.getElementById("regOpt"+i).value;
     if( restartService.checked ){
-        appendOpt += "restartService: 1 ";
+        appendOpt += "restartService: 1\t";
     }
     var emailCheckBox = document.getElementById('emailCheckBox');
     var emailListObj = document.getElementById('emailList');

@@ -17,8 +17,8 @@ video.ontimeupdate = function () {
         var deltaTime = endDate.getTime() - startDate.getTime();
         var displayFrame = video.webkitDecodedFrameCount - video.webkitDroppedFrameCount;
         var decodeFPS = video.webkitDecodedFrameCount / deltaTime * 1000;
-        var droppedFrameRate = video.webkitDroppedFrameCount/ video.webkitDecodedFrameCount;
-        storage.setItem(video.src,"decodeFPS: " + decodeFPS + " droppedFrameRate: " + droppedFrameRate); 
+        var droppedFrameRate = 100 * video.webkitDroppedFrameCount / video.webkitDecodedFrameCount;
+        storage.setItem(video.src,decodeFPS + ',' + droppedFrameRate); 
         closeWindow();
     }
 };

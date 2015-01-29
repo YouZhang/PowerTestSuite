@@ -54,8 +54,8 @@ class App(object):
         if( fpsOpt != None):
             cmd = cmd.replace("targetFPS",fpsOpt)
         cmd = cmd.replace("clipName",clip).replace("log",clipName).replace("pwd",pwd)
-        if( "PDVD" in mode ):
-            cmd = getDir(pwd,clip)+'.mkv > %s.txt' % clip
+        # if( "PDVD" in mode ):
+        #     cmd = getDir(pwd,clip)+'.mkv > %s.txt' % clip
         batFile = getDir(self.testCfg.batFilePath,clipName.replace(' ','_')+".bat")
         handle = file(batFile,'w')
         handle.write(cmd)

@@ -1,0 +1,1 @@
+tool\PnPutil.exe -a %1

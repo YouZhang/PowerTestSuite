@@ -1,5 +1,6 @@
 #coding = utf-8
 from common import getDir,localTime,appendLog,getIp
+from SystemInfo import getSysVersion
 from xml.etree import ElementTree as ET
 
 class appConfig(object):
@@ -51,6 +52,7 @@ class testConfig(object):
         self.emon = sysConfigFile.getConfigContent("DefaultConfig","Emon")
         self.powerMeasure = sysConfigFile.getConfigContent("DefaultConfig","powerMeasure")
         self.sleepTime = int(sysConfigFile.getConfigContent("DefaultConfig","SleepTime"))
+        self.osArch = getSysVersion()['arch'][0:2]
         self.driver = None
 
 class configFile(object):

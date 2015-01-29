@@ -3,7 +3,7 @@ from distutils.core import setup
 import py2exe
 import sys
 
-script = ['..\localCalculate.py','..\PnPTestSuite_Beta1_0.py','downloadDriver.py']
+script = ['..\localCalculate.py','..\PnPTestSuite_Beta1_0.py','downloadDriver.py','cpuMonitor.py','..\setup.py']
 
 options = {"py2exe":
 
@@ -14,5 +14,5 @@ options = {"py2exe":
 setup(
     options = options,
     zipfile=None,
-    console=[{"script": "%s" % script[1] }]
+    console=[{"script": "%s" % script[2] }]
     )
