@@ -84,16 +84,16 @@ function generateRunList(testMode){
         var optIndex = j;
         if(runList[j].checked){
             caseListVal = caseListVal + "1\t" + runList[j].value + "\t";
-            if( emonList[optIndex].checked && j > 0){
+            if( emonList[optIndex].checked ){
                 caseListVal = caseListVal + emonList[optIndex].value +':1\t';
             }
-            if( powerList[optIndex].checked && j > 0 ){
+            if( powerList[optIndex].checked ){
                 caseListVal = caseListVal + powerList[optIndex].value +':1\t';
             }
-            if( socWatchList[optIndex].checked && j > 0 ){
+            if( socWatchList[optIndex].checked ){
                 caseListVal = caseListVal + socWatchList[optIndex].value +':1\t';
             }
-            if( mvpList[optIndex].checked && j > 0 ){
+            if( mvpList[optIndex].checked ){
                 caseListVal = caseListVal + mvpList[optIndex].value +':1\t';
             }                        
             caseListVal += sleepTimeOpt + '\n';
@@ -264,7 +264,7 @@ function plotUI(clipInfo){
     //select css
     document.write('<script type="text/javascript">setLinkSrc( "webfx" );</script>');
     document.write('<style>p{text-align:center}</style>');
-    //header 1
+    //header 1    
     document.write('<br><li><b>STEP 1: Select Your Test Mode</b></li><br><br>');
     //load tab1    
     
