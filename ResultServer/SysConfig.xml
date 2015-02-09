@@ -12,25 +12,65 @@
         <targetDataPos>F</targetDataPos>
 	</CommonCfg>
     <SpecificCfg>
-        <VP9FixedPlayback>
+        <MVFixedPlayback>
             <Port>31500</Port>
-            <LogPath>Log\VP9FixedPlayback</LogPath>
-            <resultFolder>Results\VP9FixedPlayback</resultFolder>
-        </VP9FixedPlayback>
-        <VP9MvFreePlayback>
+            <LogPath>Log\MVFixedPlayback</LogPath>
+            <resultFolder>Results\MVFixedPlayback</resultFolder>
+        </MVFixedPlayback>
+        <MVFreePlayback>
             <Port>31501</Port>
-            <LogPath>Log\vp9MvFreePlayback</LogPath>
-            <resultFolder>Results\vp9MvFreePlayback</resultFolder>
-        </VP9MvFreePlayback>
-        <HEVCFixedPlayback>
+            <LogPath>Log\MVFreePlayback</LogPath>
+            <resultFolder>Results\MVFreePlayback</resultFolder>
+        </MVFreePlayback>
+        <MVFreeDecode>
             <Port>31502</Port>
-            <LogPath>Log\HEVCFixedPlayback</LogPath>
-            <resultFolder>Results\HEVCFixedPlayback</resultFolder>
-        </HEVCFixedPlayback>
-         <VP9FixedChrome>
+            <LogPath>Log\MVFreeDecode</LogPath>
+            <resultFolder>Results\MVFreeDecode</resultFolder>
+        </MVFreeDecode>        
+        <MFXFixedPlayback>
             <Port>31503</Port>
-            <LogPath>Log\VP9FixedChrome</LogPath>
-            <resultFolder>Results\VP9FixedChrome</resultFolder>
-        </VP9FixedChrome>
+            <LogPath>Log\MFXFixedPlayback</LogPath>
+            <resultFolder>Results\MFXFixedPlayback</resultFolder>
+        </MFXFixedPlayback>
+         <MFXFreePlayback>
+            <Port>31504</Port>
+            <LogPath>Log\MFXFreePlayback</LogPath>
+            <resultFolder>Results\MFXFreePlayback</resultFolder>
+        </MFXFreePlayback>
+        <MFXFreeDecode>
+            <Port>31505</Port>
+            <LogPath>Log\MFXFreeDecode</LogPath>
+            <resultFolder>Results\MFXFreeDecode</resultFolder>
+        </MFXFreeDecode>
+        <ChromeFixedPlayback>
+            <Port>31506</Port>
+            <LogPath>Log\ChromeFixedPlayback</LogPath>
+            <resultFolder>Results\ChromeFixedPlayback</resultFolder>
+        </ChromeFixedPlayback>
+        <FFPlayFixedPlayback>
+            <Port>31507</Port>
+            <LogPath>Log\FFPlayFixedPlayback</LogPath>
+            <resultFolder>Results\FFPlayFixedPlayback</resultFolder>
+        </FFPlayFixedPlayback>
+        <FFMpegFreeDecode>
+            <Port>31508</Port>
+            <LogPath>Log\FFMpegFreeDecode</LogPath>
+            <resultFolder>Results\FFMpegFreeDecode</resultFolder>
+        </FFMpegFreeDecode>
+        <FFMpegFixedDecode>
+            <Port>31509</Port>
+            <LogPath>Log\FFMpegFixedDecode</LogPath>
+            <resultFolder>Results\FFMpegFixedDecode</resultFolder>
+        </FFMpegFixedDecode>
+        <PotPlayerFixedPlayback>
+            <Port>31510</Port>
+            <LogPath>Log\PotPlayerFixedPlayback</LogPath>
+            <resultFolder>Results\PotPlayerFixedPlayback</resultFolder>
+        </PotPlayerFixedPlayback>
+        <PDVDPlayback>
+            <Port>31511</Port>
+            <LogPath>Log\PDVDPlayback</LogPath>
+            <resultFolder>Results\PDVDPlayback</resultFolder>
+        </PDVDPlayback>
     </SpecificCfg>
 </Vp9_Power_Test_Config>

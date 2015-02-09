@@ -40,8 +40,8 @@ def powerMeasure(mode):
 if __name__ == "__main__":
 
     threadsList = []
-    # testModeList = ["VP9MvFreePlayback","VP9FixedChrome","VP9FixedPlayback","HEVCFixedPlayback"]
-    testModeList = ["HEVCFixedPlayback"]
+    # testModeList = ["MVFixedPlayback","MVFreePlayback","MVFreeDecode","MFXFixedPlayback","MFXFreePlayback","MFXFreeDecode","ChromeFixedPlayback","FFPlayFixedPlayback","FFMpegFreeDecode","FFMpegFixedDecode","PotPlayerFixedPlayback"]
+    testModeList = ["MVFixedPlayback","ChromeFixedPlayback","MFXFixedPlayback",'PDVDPlayback','PotPlayerFixedPlayback']
     for mode in testModeList:
         thread = threading.Thread(target=powerMeasure,args=(mode,))
         threadsList.append(thread)
