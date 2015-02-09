@@ -1,6 +1,6 @@
 #coding = utf-8
 from xml.etree import ElementTree as ET
-from common import getDir,getIp,localTime,appendLog
+from common import getDir,getIp,localTime,appendLog,
 
 class sysConfigFile(object):
 
@@ -34,20 +34,27 @@ class testConfig(object):
         configFile = sysConfigFile()
         serverName = configFile.getConfigContent("CommonCfg","ServerMachine")
         ip = getIp(serverName,testMode)
-        port = int(configFile.getConfigContent("SpecificCfg",testMode,"Port"))
-        self.resultFolder = configFile.getConfigContent("SpecificCfg",testMode,"resultFolder")
-        self.logFilePath = configFile.getConfigContent("SpecificCfg",testMode,"LogPath")
+        port = int(configFile.getConfigContent("SpecificCfg",testMode,"Port"))               
         self.address = (ip,port)
-        # folder config
-        self.resultFile = getDir(self.resultFolder,localTime+".xlsx")
-        self.rawDataStoreFolder = configFile.getConfigContent("CommonCfg","rawDataFolder")
         self.rawDataFilePath = getDir(self.rawDataStoreFolder,"test.lvm")
+        # folder config
+        self.logFilePath = configFile.getConfigContent("SpecificCfg",testMode,"LogPath")
+        self.resultFolder = configFile.getConfigContent("SpecificCfg",testMode,"resultFolder")        
+        self.rawDataStoreFolder = configFile.getConfigContent("CommonCfg","rawDataFolder")        
         self.rawDataBackupFolder = getDir(self.rawDataStoreFolder,localTime)
         # start Button & end Button config
         self.startButtonPos = tuple(configFile.getConfigContent("CommonCfg","startButtonPos").split())
         self.stopButtonPos = tuple(configFile.getConfigContent("CommonCfg","stopButtonPos").split())
         # diagram config
+        self.resultFile = getDir(self.resultFolder,localTime+".xlsx")
         self.initRow = tuple(configFile.getConfigContent("CommonCfg","initRow").split())
         self.chartType = configFile.getConfigContent("CommonCfg","chartType")
         self.chartStyle = int(configFile.getConfigContent("CommonCfg","chartStyle"))
         self.targetDataPos = configFile.getConfigContent("CommonCfg","targetDataPos")
+        self.initFolder()
+        
+    def initFolder():
+        mkdir(self.resultFolder)
+        mkdir(self.resultFolder)
+        mkdir(self.rawDataStoreFolder)
+        mkdir(self.rawDataBackupFolder)
