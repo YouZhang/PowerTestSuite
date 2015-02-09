@@ -1,6 +1,6 @@
 #coding = utf-8
 from xml.etree import ElementTree as ET
-from common import getDir,getIp,localTime,appendLog,
+from common import getDir,getIp,localTime,appendLog,mkdir
 
 class sysConfigFile(object):
 
