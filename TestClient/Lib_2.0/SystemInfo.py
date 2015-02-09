@@ -56,7 +56,7 @@ def matchPatten(content,patten,pos=0):
         return None
 
 def getDisplayDriverVer():
-    infFile = glob.glob('C:\Windows\System32\DriverStore\FileRepository\igdlh*\igdlh*.inf')[0]
+    infFile = glob.glob('C:\Windows\System32\DriverStore\FileRepository\igdlh*\igdlh*.inf')[-1]
     content = readFile(infFile)
     patten = '.*"(\w+-\w+-\d+)".*'
     driverLabel = matchPatten(content,patten)

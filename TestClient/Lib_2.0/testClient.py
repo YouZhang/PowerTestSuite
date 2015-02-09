@@ -70,10 +70,13 @@ def getNumberFromBlob(buffer):
     tempBuffer = str(buffer)
     bufferList = tempBuffer.split()
     for item in bufferList:
-        [decodeFPS,droppedFrameRate] = item.split(',')
-        decodeFPS = filter(lambda c : c.isdigit() or c == '.',decodeFPS)
-        droppedFrameRate = filter(lambda c : c.isdigit() or c == '.',droppedFrameRate)
-        info = [decodeFPS,droppedFrameRate]
+        try:
+            [decodeFPS,droppedFrameRate] = item.split(',')
+            decodeFPS = filter(lambda c : c.isdigit() or c == '.',decodeFPS)
+            droppedFrameRate = filter(lambda c : c.isdigit() or c == '.',droppedFrameRate)
+            info = [decodeFPS,droppedFrameRate]
+        except:
+            info = ['0','0']
     return info
 
 def getChromeFPS(clipName,localStorge='C:\Users\%s\AppData\Local\Chromium\User Data\Default\Local Storage\__0.localstorage'):
@@ -149,7 +152,7 @@ def getFpsInfo(fpsReport,gpuTime=None,frameNum=0):
                 fps = int(frameNum) / string.atof(gpuTime)
                 appendLog( "fps : %s" % fps)
             elif("ffmpeg" in contents):
-                patten = ".+fps= (\d+) .+"
+                patten = ".+fps=\s*(\d+) .+"
                 fps = matchCase(contents,patten,pos)
                 appendLog( "fps : %s" % fps)
             elif("fps" in contents):
@@ -400,7 +403,10 @@ class testClient(object):
                     self.runCase(cmd)
                     fps,gpuUsage,cpuUsage,pkgPower = self.postProcess(caseToRun,frameNum)
                     if( 'chrome' in self.appCfgOpt.lower()):
-                        fps = getChromeFPS(caseToRun)
+                        fpsInfo = getChromeFPS(caseToRun)
+                        fps = fpsInfo[0]
+                        appendLog('decode fps : %s' % fps)
+                        appendLog('dropped frame rate : %s' % fpsInfo[1])
                     if( fps != '0'):
                         removeDoneCase(self.myAppCfg.runList,caseToRunList,caseToRun)
                     if(self.testCfg.restartSvr == "True"):
